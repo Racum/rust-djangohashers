@@ -1,0 +1,15 @@
+[package]
+name = "djangohashers"
+version = "0.1.0"
+authors = ["Ronaldo Racum <ronaldo@racum.com>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+repository = "https://github.com/racum/rust-djangohashers"
+
+[lib]
+doc = true
+doctest = false
+
+[dependencies]
+rust-crypto = "^0.2"
+rustc-serialize = "^0.3"
