@@ -99,4 +99,119 @@ mod tests {
         assert!(!check_password(" ", &blank_encoded).unwrap());
     }
 
+    #[test]
+    fn test_bcrypt_sha256() {
+        let encoded = make_password_with_settings("lètmein", "", Algorithm::BCryptSHA256);
+        assert!(is_password_usable(&encoded));
+        assert!(encoded.starts_with("bcrypt_sha256$"));
+        assert!(check_password("lètmein", &encoded).unwrap());
+        assert!(!check_password("lètmeinz", &encoded).unwrap());
+        // Verify that password truncation no longer works
+        let password = "VSK0UYV6FFQVZ0KG88DYN9WADAADZO1CTSIVDJUNZSUML6IBX7LN7ZS3R5JGB3RGZ7VI7G7DJQ\
+                        9NI8BQFSRPTG6UWTTVESA5ZPUN";
+        let trunc_encoded = make_password_with_settings(password, "", Algorithm::BCryptSHA256);
+        assert!(check_password(password, &trunc_encoded).unwrap());
+        assert!(!check_password(&password[0..72], &trunc_encoded).unwrap());
+        // Blank passwords
+        let blank_encoded = make_password_with_settings("", "", Algorithm::BCryptSHA256);
+        assert!(is_password_usable(&blank_encoded));
+        assert!(blank_encoded.starts_with("bcrypt_sha256$"));
+        assert!(check_password("", &blank_encoded).unwrap());
+        assert!(!check_password(" ", &blank_encoded).unwrap());
+    }
+
+    #[test]
+    fn test_bcrypt() {
+        let encoded = make_password_with_settings("lètmein", "", Algorithm::BCrypt);
+        assert!(is_password_usable(&encoded));
+        assert!(encoded.starts_with("bcrypt$"));
+        assert!(check_password("lètmein", &encoded).unwrap());
+        assert!(!check_password("lètmeinz", &encoded).unwrap());
+        // Blank passwords
+        let blank_encoded = make_password_with_settings("", "", Algorithm::BCrypt);
+        assert!(is_password_usable(&blank_encoded));
+        assert!(blank_encoded.starts_with("bcrypt$"));
+        assert!(check_password("", &blank_encoded).unwrap());
+        assert!(!check_password(" ", &blank_encoded).unwrap());
+    }
+
+    // #[test]
+    // fn test_bcrypt_upgrade() {
+    //     unimplemented!()
+    // }
+
+    #[test]
+    fn test_unusable() {
+        let encoded = "!Q24gQu9Sy3X1PJPCaEMTRrw5eLFWY8htI2FsqCbC"; // From make_password(None)
+        assert!(encoded.len() == 41);
+        // assert!(!is_password_usable(&encoded));
+        assert!(!check_password(&encoded, &encoded).unwrap());
+        assert!(!check_password("!", &encoded).unwrap());
+        assert!(!check_password("", &encoded).unwrap());
+        assert!(!check_password("lètmein", &encoded).unwrap());
+        assert!(!check_password("lètmeinz", &encoded).unwrap());
+    }
+
+    // #[test]
+    // fn test_unspecified_password() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_bad_algorithm() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_bad_encoded() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_low_level_pbkdf2() {
+    //     unimplemented!()
+    // }
+
+    #[test]
+    fn test_low_level_pbkdf2_sha1() {
+        let encoded = make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2SHA1);
+        assert!(encoded == "pbkdf2_sha1$24000$seasalt2$L37ETdd9trqrsJDwapU3P+2Edhg=".to_string());
+        assert!(check_password("lètmein", &encoded).unwrap());
+    }
+
+    // #[test]
+    // fn test_upgrade() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_no_upgrade() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_no_upgrade_on_incorrect_pass() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_pbkdf2_upgrade() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_pbkdf2_upgrade_new_hasher() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_load_library_no_algorithm() {
+    //     unimplemented!()
+    // }
+    //
+    // #[test]
+    // fn test_load_library_importerror() {
+    //     unimplemented!()
+    // }
+
 }

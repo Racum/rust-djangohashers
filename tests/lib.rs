@@ -58,4 +58,20 @@ mod tests {
         assert!(check_password(PASSWORD, &encoded).unwrap());
     }
 
+    #[test]
+    fn test_bcrypt_sha256() {
+        let encoded = make_password_with_settings(PASSWORD, "", Algorithm::BCryptSHA256);
+        assert!(check_password(PASSWORD, &encoded).unwrap());
+        let h = "bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPesa1EyXVcTXK";
+        assert!(check_password(PASSWORD, h).unwrap());
+    }
+
+    #[test]
+    fn test_bcrypt() {
+        let encoded = make_password_with_settings(PASSWORD, "", Algorithm::BCrypt);
+        assert!(check_password(PASSWORD, &encoded).unwrap());
+        let h = "bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6Y/.";
+        assert!(check_password(PASSWORD, h).unwrap());
+    }
+
 }

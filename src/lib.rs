@@ -1,5 +1,6 @@
 extern crate rustc_serialize;
 extern crate crypto;
+extern crate bcrypt;
 
 use rustc_serialize::base64::{STANDARD, ToBase64};
 use crypto::digest::Digest;
@@ -8,6 +9,8 @@ use crypto::sha2::Sha256;
 use crypto::sha1::Sha1;
 use crypto::md5::Md5;
 use crypto::pbkdf2::pbkdf2;
+use bcrypt::hash as bcrypt_hash;
+use bcrypt::verify as bcrypt_verify;
 
 
 #[derive(Debug)]
@@ -72,7 +75,7 @@ pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError
 
     // if encoded_part[0] == "bcrypt_sha256" || encoded_part[0] == "bcrypt" {
     if encoded_part[0].starts_with("bcrypt") {
-        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(1, "$").collect();
+        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
         salt = "";
         hash = bcrypt_encoded_part[1];
     } else {
@@ -113,10 +116,26 @@ pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError
             return Ok(hash == hash_pbkdf2_sha1(password, salt, iterations));
         }
         "bcrypt_sha256" => {
-            return Ok(unimplemented!());
+            let mut sha = Sha256::new();
+            sha.input_str(password);
+            match bcrypt_verify(&sha.result_str(), hash) {
+                Ok(valid) => {
+                    return Ok(valid);
+                }
+                Err(_) => {
+                    return Ok(false);
+                }
+            }
         }
         "bcrypt" => {
-            return Ok(unimplemented!());
+            match bcrypt_verify(password, hash) {
+                Ok(valid) => {
+                    return Ok(valid);
+                }
+                Err(_) => {
+                    return Ok(false);
+                }
+            }
         }
         "sha1" => {
             return Ok(hash == hash_sha1(password, salt));
@@ -144,8 +163,16 @@ pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algori
             let hash = hash_pbkdf2_sha1(password, salt, iterations);
             format!("{}${}${}${}", "pbkdf2_sha1", iterations, salt, hash)
         }
-        Algorithm::BCryptSHA256 => unimplemented!(),
-        Algorithm::BCrypt => unimplemented!(),
+        Algorithm::BCryptSHA256 => {
+            let mut sha = Sha256::new();
+            sha.input_str(password);
+            let hash = bcrypt_hash(&sha.result_str(), 12).unwrap();
+            format!("{}${}", "bcrypt_sha256", hash)
+        }
+        Algorithm::BCrypt => {
+            let hash = bcrypt_hash(password, 12).unwrap();
+            format!("{}${}", "bcrypt", hash)
+        }
         Algorithm::SHA1 => {
             let hash = hash_sha1(password, salt);
             format!("{}${}${}", "sha1", salt, hash)

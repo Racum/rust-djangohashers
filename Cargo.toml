@@ -12,4 +12,5 @@ doctest = false
 
 [dependencies]
 rust-crypto = "^0.2"
+bcrypt = "0.1"
 rustc-serialize = "^0.3"
