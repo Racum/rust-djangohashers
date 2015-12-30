@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate djangohashers;
 
 // This is an almost line-by-line translation from the hashers' test from Django 1.9:
