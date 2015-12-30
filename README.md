@@ -24,9 +24,7 @@ extern crate djangohashers;
 use djangohashers::*;
 
 // Or, just what you need:
-use djangohashers::{check_password, make_password, Algorithm}
-
-...
+use djangohashers::{check_password, make_password, Algorithm};
 ```
 
 ## Compatibility
@@ -117,7 +115,7 @@ let encoded = make_password_with_settings("KRONOS", "seasalt", Algorithm::PBKDF2
 // pbkdf2_sha1$24000$seasalt$F+kiWNHXbMBcwgxsvSKFCWHnZZ0=
 ```
 
-### Utilities
+### Verifying a Hash Format (pre-crypto)
 
 Function signature:
 
