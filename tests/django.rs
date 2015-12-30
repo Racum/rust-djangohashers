@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate djangohashers;
 
-// Django 1.9:
+// This is an almost line-by-line translation from the hashers' test from Django 1.9:
 // https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py
+// ...except for some cases that don't make sense in Rust, or in the scope of this library.
 
 #[cfg(test)]
 mod tests {
@@ -99,6 +100,9 @@ mod tests {
         assert!(!check_password(" ", &blank_encoded).unwrap());
     }
 
+    // Hasher based on UNIX's crypt(3) not implemented:
+    // - test_crypt
+
     #[test]
     fn test_bcrypt_sha256() {
         let encoded = make_password_with_settings("lètmein", "", Algorithm::BCryptSHA256);
@@ -135,10 +139,8 @@ mod tests {
         assert!(!check_password(" ", &blank_encoded).unwrap());
     }
 
-    // #[test]
-    // fn test_bcrypt_upgrade() {
-    //     unimplemented!()
-    // }
+    // This library does not fire upgrade callbacks:
+    // - test_bcrypt_upgrade
 
     #[test]
     fn test_unusable() {
@@ -152,25 +154,24 @@ mod tests {
         assert!(!check_password("lètmeinz", &encoded).unwrap());
     }
 
-    // #[test]
-    // fn test_unspecified_password() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_bad_algorithm() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_bad_encoded() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_low_level_pbkdf2() {
-    //     unimplemented!()
-    // }
+    // Scenario not possible during run time:
+    // - test_unspecified_password
+    // - test_bad_algorithm
+
+    #[test]
+    fn test_bad_encoded() {
+        assert!(!is_password_usable("lètmein_badencoded"));
+        assert!(!is_password_usable(""));
+    }
+
+    #[test]
+    fn test_low_level_pbkdf2() {
+        let encoded = make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2);
+        assert!(encoded ==
+                "pbkdf2_sha256$24000$seasalt2$TUDkfilKHVC7BkaKSZgIKhm0aTtXlmcw/5C1FeS/DPk="
+                    .to_string());
+        assert!(check_password("lètmein", &encoded).unwrap());
+    }
 
     #[test]
     fn test_low_level_pbkdf2_sha1() {
@@ -179,39 +180,15 @@ mod tests {
         assert!(check_password("lètmein", &encoded).unwrap());
     }
 
-    // #[test]
-    // fn test_upgrade() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_no_upgrade() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_no_upgrade_on_incorrect_pass() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_pbkdf2_upgrade() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_pbkdf2_upgrade_new_hasher() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_load_library_no_algorithm() {
-    //     unimplemented!()
-    // }
-    //
-    // #[test]
-    // fn test_load_library_importerror() {
-    //     unimplemented!()
-    // }
+    // This library does not fire upgrade callbacks:
+    // - test_upgrade
+    // - test_no_upgrade
+    // - test_no_upgrade_on_incorrect_pass
+    // - test_pbkdf2_upgrade
+    // - test_pbkdf2_upgrade_new_hasher
+
+    // Scenario not possible during run time:
+    // - test_load_library_no_algorithm
+    // - test_load_library_importerror
 
 }

@@ -1,6 +1,7 @@
 extern crate rustc_serialize;
 extern crate crypto;
 extern crate bcrypt;
+extern crate rand;
 
 use rustc_serialize::base64::{STANDARD, ToBase64};
 use crypto::digest::Digest;
@@ -11,6 +12,7 @@ use crypto::md5::Md5;
 use crypto::pbkdf2::pbkdf2;
 use bcrypt::hash as bcrypt_hash;
 use bcrypt::verify as bcrypt_verify;
+use rand::Rng;
 
 
 #[derive(Debug)]
@@ -20,7 +22,8 @@ pub enum HasherError {
     InvalidIterations,
 }
 
-// No "Crypt": it is not recommended for being too weak and not available in all platforms.
+// No "Crypt":
+// UNIX's crypt(3) it is not recommended for being too weak and not available in all platforms.
 pub enum Algorithm {
     PBKDF2,
     PBKDF2SHA1,
@@ -32,9 +35,11 @@ pub enum Algorithm {
     UnsaltedMD5,
 }
 
-#[allow(unused_variables)]
 pub fn is_password_usable(encoded: &str) -> bool {
-    true
+    let prefixes = vec!["pbkdf2_sha256", "pbkdf2_sha1", "bcrypt_sha256", "bcrypt", "sha1", "md5"];
+    let encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
+    let prefix = encoded_part[0];
+    !(encoded == "" || encoded.starts_with("!")) && prefixes.contains(&prefix)
 }
 
 fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
@@ -190,7 +195,8 @@ pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algori
 }
 
 pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> String {
-    make_password_with_settings(password, "seasalt", algorithm)
+    let salt = rand::thread_rng().gen_ascii_chars().take(12).collect::<String>();
+    make_password_with_settings(password, &salt, algorithm)
 }
 
 pub fn make_password(password: &str) -> String {
