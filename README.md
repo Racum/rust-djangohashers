@@ -38,6 +38,14 @@ use djangohashers::*;
 
 ### Verifying a Hashed Password
 
+Function signature:
+
+```rust
+pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError> {...}
+```
+
+Example:
+
 ```rust
 let password = "KRONOS"; // Sent by the user.
 let encoded = "pbkdf2_sha256$24000$..."; // Fetched from DB.
@@ -57,6 +65,14 @@ match check_password(password, encoded) {
 ```
 
 ### Generating a Hashed Password
+
+Function signatures:
+
+```rust
+pub fn make_password(password: &str) -> String {...}
+pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> String {...}
+pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algorithm) -> String {...}
+```
 
 Using default settings (PBKDF2 algorithm, random salt):
 
@@ -83,6 +99,12 @@ let encoded = make_password_with_settings("KRONOS", "seasalt", Algorithm::PBKDF2
 ```
 
 ### Utilities
+
+Function signature:
+
+```rust
+pub fn is_password_usable(encoded: &str) -> bool {...}
+```
 
 You can check if the password hash is properly formatted before running the expensive cryto stuff:
 
