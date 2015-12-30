@@ -33,6 +33,16 @@ use djangohashers::*;
 ...
 ```
 
+## Compatibility
+
+DjangoHashers passes all relevant unit tests from Django 1.9, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+
+What is **not** covered:
+
+* `CryptPasswordHasher`, that uses UNIX's `crypt(3)` hash function.
+* Upgrade/Downgrade callbacks (`must_update`, `setter`).
+* Any 3rd-party hasher outside Django's code.
+* Some tests that makes no sense in idiomatic Rust.
 
 ## Usage
 
