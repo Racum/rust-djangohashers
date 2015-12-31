@@ -75,6 +75,7 @@ mod tests {
     fn test_unsalted_md5() {
         let encoded = make_password_with_settings("lètmein", "", Algorithm::UnsaltedMD5);
         assert!(encoded == "88a434c88cca4e900f7874cd98123f43".to_string());
+        assert!(is_password_usable(&encoded));
         assert!(check_password("lètmein", &encoded).unwrap());
         assert!(!check_password("lètmeinz", &encoded).unwrap());
         // Blank passwords
@@ -90,8 +91,9 @@ mod tests {
         assert!(is_password_usable(&encoded));
         assert!(check_password("lètmein", &encoded).unwrap());
         assert!(!check_password("lètmeinz", &encoded).unwrap());
+        // Raw SHA1 isn't acceptable
+        assert!(check_password("lètmein", "6d138ca3ae545631b3abd71a4f076ce759c5700b").is_err());
         // Blank passwords
-        assert!(!check_password("lètmein", "6d138ca3ae545631b3abd71a4f076ce759c5700b").unwrap());
         let blank_encoded = make_password_with_settings("", "", Algorithm::UnsaltedSHA1);
         assert!(blank_encoded.starts_with("sha1$"));
         assert!(is_password_usable(&blank_encoded));
@@ -145,12 +147,12 @@ mod tests {
     fn test_unusable() {
         let encoded = "!Q24gQu9Sy3X1PJPCaEMTRrw5eLFWY8htI2FsqCbC"; // From make_password(None)
         assert!(encoded.len() == 41);
-        // assert!(!is_password_usable(&encoded));
-        assert!(!check_password(&encoded, &encoded).unwrap());
-        assert!(!check_password("!", &encoded).unwrap());
-        assert!(!check_password("", &encoded).unwrap());
-        assert!(!check_password("lètmein", &encoded).unwrap());
-        assert!(!check_password("lètmeinz", &encoded).unwrap());
+        assert!(!is_password_usable(&encoded));
+        assert!(check_password(&encoded, &encoded).is_err());
+        assert!(check_password("!", &encoded).is_err());
+        assert!(check_password("", &encoded).is_err());
+        assert!(check_password("lètmein", &encoded).is_err());
+        assert!(check_password("lètmeinz", &encoded).is_err());
     }
 
     // Scenario not possible during run time:

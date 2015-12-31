@@ -12,7 +12,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.1.0"
+djangohashers = "^0.1"
 ```
 
 Reference and import:
@@ -46,9 +46,10 @@ Function signature:
 
 ```rust
 pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError> {}
+pub fn check_password_tolerant(password: &str, encoded: &str) -> bool {}
 ```
 
-Example:
+Complete version:
 
 ```rust
 let password = "KRONOS"; // Sent by the user.
@@ -67,6 +68,23 @@ match check_password(password, encoded) {
     }
 }
 ```
+
+Possible Errors:
+
+* `HasherError::UnknownAlgorithm`: anything not recognizable as an algorithm.
+* `HasherError::InvalidIterations`: number of iterations is not a positive integer.
+* `HasherError::EmptyHash`: hash string is empty.
+
+If you want to automatically assume all errors as *"invalid password"*, there is a shortcut for that:
+
+```rust
+if check_password_tolerant(password, encoded) {
+	// Log the user in.
+} else {
+	// Ask the user to try again.
+}
+```
+
 
 ### Generating a Hashed Password
 

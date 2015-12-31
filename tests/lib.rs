@@ -74,4 +74,38 @@ mod tests {
         assert!(check_password(PASSWORD, h).unwrap());
     }
 
+    #[test]
+    fn test_is_password_usable() {
+        // Good hashes:
+        assert!(is_password_usable("pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU="));
+        assert!(is_password_usable("7cf6409a82cd4c8b96a9ecf6ad679119"));
+        // Bad hashes:
+        assert!(!is_password_usable(""));
+        assert!(!is_password_usable("password"));
+        assert!(!is_password_usable("!cf6409a82cd4c8b96a9ecf6ad679119"));
+    }
+
+    #[test]
+    fn test_check_password_tolerant() {
+        let negative = "pbkdf2_sha256$-24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
+        assert!(!check_password_tolerant(PASSWORD, negative));
+        let nan = "pbkdf2_sha256$NaN$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
+        assert!(!check_password_tolerant(PASSWORD, nan));
+        let rot13 = "rot13$1$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
+        assert!(!check_password_tolerant(PASSWORD, rot13));
+        assert!(!check_password_tolerant(PASSWORD, ""));
+    }
+
+    #[test]
+    fn test_errors() {
+        let negative = "pbkdf2_sha256$-24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
+        assert!(check_password(PASSWORD, negative) == Err(HasherError::InvalidIterations));
+        let nan = "pbkdf2_sha256$NaN$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
+        assert!(check_password(PASSWORD, nan) == Err(HasherError::InvalidIterations));
+        let rot13 = "rot13$1$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
+        assert!(check_password(PASSWORD, rot13) == Err(HasherError::UnknownAlgorithm));
+        assert!(check_password(PASSWORD, "") == Err(HasherError::EmptyHash));
+    }
+
+
 }

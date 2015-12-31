@@ -1,29 +1,13 @@
-extern crate rustc_serialize;
-extern crate crypto;
-extern crate bcrypt;
 extern crate rand;
 
-use rustc_serialize::base64::{STANDARD, ToBase64};
-use crypto::digest::Digest;
-use crypto::hmac::Hmac;
-use crypto::sha2::Sha256;
-use crypto::sha1::Sha1;
-use crypto::md5::Md5;
-use crypto::pbkdf2::pbkdf2;
-use bcrypt::hash as bcrypt_hash;
-use bcrypt::verify as bcrypt_verify;
 use rand::Rng;
+mod crypto_utils;
+mod hashers;
+
+pub use hashers::*;
 
 
-#[derive(Debug)]
-pub enum HasherError {
-    UnknownAlgorithm,
-    InvalidEncoding,
-    InvalidIterations,
-}
-
-// No "Crypt":
-// UNIX's crypt(3) it is not recommended for being too weak and not available in all platforms.
+#[derive(PartialEq)]
 pub enum Algorithm {
     PBKDF2,
     PBKDF2SHA1,
@@ -35,163 +19,69 @@ pub enum Algorithm {
     UnsaltedMD5,
 }
 
+fn identify_hasher(encoded: &str) -> Option<Algorithm> {
+    if (encoded.len() == 32 && !encoded.contains("$")) ||
+       (encoded.len() == 37 && encoded.starts_with("md5$$")) {
+        Some(Algorithm::UnsaltedMD5)
+    } else if encoded.len() == 46 && encoded.starts_with("sha1$$") {
+        Some(Algorithm::UnsaltedSHA1)
+    } else {
+        let encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
+        match encoded_part[0] {
+            "pbkdf2_sha256" => Some(Algorithm::PBKDF2),
+            "pbkdf2_sha1" => Some(Algorithm::PBKDF2SHA1),
+            "bcrypt_sha256" => Some(Algorithm::BCryptSHA256),
+            "bcrypt" => Some(Algorithm::BCrypt),
+            "sha1" => Some(Algorithm::SHA1),
+            "md5" => Some(Algorithm::MD5),
+            _ => None,
+        }
+    }
+}
+
+fn get_hasher(algorithm: Algorithm) -> Box<Hasher + 'static> {
+    match algorithm {
+        Algorithm::PBKDF2 => Box::new(PBKDF2Hasher),
+        Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
+        Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
+        Algorithm::BCrypt => Box::new(BCryptHasher),
+        Algorithm::SHA1 => Box::new(SHA1Hasher),
+        Algorithm::MD5 => Box::new(MD5Hasher),
+        Algorithm::UnsaltedSHA1 => Box::new(UnsaltedSHA1Hasher),
+        Algorithm::UnsaltedMD5 => Box::new(UnsaltedMD5Hasher),
+    }
+}
+
 pub fn is_password_usable(encoded: &str) -> bool {
-    let prefixes = vec!["pbkdf2_sha256", "pbkdf2_sha1", "bcrypt_sha256", "bcrypt", "sha1", "md5"];
-    let encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
-    let prefix = encoded_part[0];
-    !(encoded == "" || encoded.starts_with("!")) && prefixes.contains(&prefix)
-}
-
-fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
-    let mut mac = Hmac::new(Sha256::new(), &password.as_bytes());
-    let mut result = [0u8; 32];
-    pbkdf2(&mut mac, &salt.as_bytes(), iterations, &mut result);
-    result.to_base64(STANDARD)
-}
-
-fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
-    let mut mac = Hmac::new(Sha1::new(), &password.as_bytes());
-    let mut result = [0u8; 20];
-    pbkdf2(&mut mac, &salt.as_bytes(), iterations, &mut result);
-    result.to_base64(STANDARD)
-}
-
-fn hash_sha1(password: &str, salt: &str) -> String {
-    let mut sha = Sha1::new();
-    sha.input_str(salt);
-    sha.input_str(password);
-    sha.result_str()
-}
-
-fn hash_md5(password: &str, salt: &str) -> String {
-    let mut md5 = Md5::new();
-    md5.input_str(salt);
-    md5.input_str(password);
-    md5.result_str()
+    match identify_hasher(encoded) {
+        Some(_) => !(encoded == "" || encoded.starts_with("!")),
+        None => false,
+    }
 }
 
 pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError> {
-
-    let encoded_part: Vec<&str> = encoded.split("$").collect();
-
-    let salt: &str;
-    let hash: &str;
-    let mut iterations: u32 = 0;
-
-    // if encoded_part[0] == "bcrypt_sha256" || encoded_part[0] == "bcrypt" {
-    if encoded_part[0].starts_with("bcrypt") {
-        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
-        salt = "";
-        hash = bcrypt_encoded_part[1];
-    } else {
-        match encoded_part.len() {
-            4 => {
-                salt = encoded_part[2];
-                hash = encoded_part[3];
-                match encoded_part[1].parse::<u32>() {
-                    Ok(n) => {
-                        iterations = n;
-                    }
-                    Err(_) => {
-                        return Err(HasherError::InvalidIterations);
-                    }
-                }
-            }
-            3 => {
-                salt = encoded_part[1];
-                hash = encoded_part[2];
-            }
-            1 => {
-                // UnsaltedMD5
-                salt = "";
-                hash = encoded_part[0];
-                return Ok(hash == hash_md5(password, salt));
-            }
-            _ => {
-                return Err(HasherError::InvalidEncoding);
-            }
-        }
+    if encoded == "" {
+        return Err(HasherError::EmptyHash);
     }
-
-    match encoded_part[0] {
-        "pbkdf2_sha256" => {
-            return Ok(hash == hash_pbkdf2_sha256(password, salt, iterations));
+    match identify_hasher(encoded) {
+        Some(algorithm) => {
+            let hasher = get_hasher(algorithm);
+            hasher.verify(password, encoded)
         }
-        "pbkdf2_sha1" => {
-            return Ok(hash == hash_pbkdf2_sha1(password, salt, iterations));
-        }
-        "bcrypt_sha256" => {
-            let mut sha = Sha256::new();
-            sha.input_str(password);
-            match bcrypt_verify(&sha.result_str(), hash) {
-                Ok(valid) => {
-                    return Ok(valid);
-                }
-                Err(_) => {
-                    return Ok(false);
-                }
-            }
-        }
-        "bcrypt" => {
-            match bcrypt_verify(password, hash) {
-                Ok(valid) => {
-                    return Ok(valid);
-                }
-                Err(_) => {
-                    return Ok(false);
-                }
-            }
-        }
-        "sha1" => {
-            return Ok(hash == hash_sha1(password, salt));
-        }
-        "md5" => {
-            return Ok(hash == hash_md5(password, salt));
-        }
-        _ => {
-            return Err(HasherError::UnknownAlgorithm);
-        }
+        None => Err(HasherError::UnknownAlgorithm),
     }
-
 }
 
-/// Turn a plain-text password into a hash for database storage.
-pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algorithm) -> String {
-    match algorithm {
-        Algorithm::PBKDF2 => {
-            let iterations = 24000;
-            let hash = hash_pbkdf2_sha256(password, salt, iterations);
-            format!("{}${}${}${}", "pbkdf2_sha256", iterations, salt, hash)
-        }
-        Algorithm::PBKDF2SHA1 => {
-            let iterations = 24000;
-            let hash = hash_pbkdf2_sha1(password, salt, iterations);
-            format!("{}${}${}${}", "pbkdf2_sha1", iterations, salt, hash)
-        }
-        Algorithm::BCryptSHA256 => {
-            let mut sha = Sha256::new();
-            sha.input_str(password);
-            let hash = bcrypt_hash(&sha.result_str(), 12).unwrap();
-            format!("{}${}", "bcrypt_sha256", hash)
-        }
-        Algorithm::BCrypt => {
-            let hash = bcrypt_hash(password, 12).unwrap();
-            format!("{}${}", "bcrypt", hash)
-        }
-        Algorithm::SHA1 => {
-            let hash = hash_sha1(password, salt);
-            format!("{}${}${}", "sha1", salt, hash)
-        }
-        Algorithm::MD5 => {
-            let hash = hash_md5(password, salt);
-            format!("{}${}${}", "md5", salt, hash)
-        }
-        Algorithm::UnsaltedSHA1 => {
-            let hash = hash_sha1(password, "");
-            format!("{}$${}", "sha1", hash)
-        }
-        Algorithm::UnsaltedMD5 => hash_md5(password, salt).to_string(),
+pub fn check_password_tolerant(password: &str, encoded: &str) -> bool {
+    match check_password(password, encoded) {
+        Ok(valid) => valid,
+        Err(_) => false,
     }
+}
+
+pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algorithm) -> String {
+    let hasher = get_hasher(algorithm);
+    hasher.encode(password, salt)
 }
 
 pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> String {
@@ -201,4 +91,35 @@ pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> Str
 
 pub fn make_password(password: &str) -> String {
     make_password_with_algorithm(password, Algorithm::PBKDF2)
+}
+
+#[test]
+fn test_identify_hasher() {
+    // Good hashes:
+    assert!(identify_hasher("pbkdf2_sha256$24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395\
+                             nZatXTJpEtTY=")
+                .unwrap() == Algorithm::PBKDF2);
+    assert!(identify_hasher("pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU=")
+                .unwrap() == Algorithm::PBKDF2SHA1);
+    assert!(identify_hasher("sha1$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00")
+                .unwrap() == Algorithm::SHA1);
+    assert!(identify_hasher("md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e").unwrap() ==
+            Algorithm::MD5);
+    assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad679119").unwrap() == Algorithm::UnsaltedMD5);
+    assert!(identify_hasher("md5$$7cf6409a82cd4c8b96a9ecf6ad679119").unwrap() ==
+            Algorithm::UnsaltedMD5);
+    assert!(identify_hasher("sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7").unwrap() ==
+            Algorithm::UnsaltedSHA1);
+    assert!(identify_hasher("bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPes\
+                             a1EyXVcTXK")
+                .unwrap() == Algorithm::BCryptSHA256);
+    assert!(identify_hasher("bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6\
+                             Y/.")
+                .unwrap() == Algorithm::BCrypt);
+    // Bad hashes:
+    assert!(identify_hasher("").is_none());
+    assert!(identify_hasher("password").is_none());
+    assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad6791190").is_none());
+    assert!(identify_hasher("blah$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00")
+                .is_none());
 }

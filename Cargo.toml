@@ -15,6 +15,6 @@ bench = true
 
 [dependencies]
 rust-crypto = "^0.2"
-bcrypt = "0.1"
+bcrypt = "^0.1"
 rustc-serialize = "^0.3"
-rand = "0.3"
+rand = "^0.3"
