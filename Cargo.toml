@@ -5,10 +5,13 @@ authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 license = "BSD-3-Clause"
 readme = "README.md"
 repository = "https://github.com/racum/rust-djangohashers"
+keywords = ["hashing", "hash", "password", "python", "django", "crypto", "pbkdf2", "bcrypt"]
+description = "A Rust port of the password primitives used in Django project."
 
 [lib]
 doc = true
 doctest = false
+bench = true
 
 [dependencies]
 rust-crypto = "^0.2"
