@@ -4,20 +4,28 @@ use crypto_utils;
 const PBKDF2_ITERATIONS: u32 = 24000;
 const BCRYPT_ROUNDS: u32 = 12;
 
+/// Possible errors during a hash creation.
 #[derive(PartialEq, Debug)]
 pub enum HasherError {
+    /// Algorithm not recognizable.
     UnknownAlgorithm,
+    /// Number of iterations is not a positive integer.
     EmptyHash,
+    /// Hash string is empty.
     InvalidIterations,
 }
 
+/// Hasher abstraction, providing methods to encode and verify hashes.
 pub trait Hasher {
+    /// Verifies a password against an encoded hash.
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError>;
+    /// Generates an encoded hash for a given password and salt.
     fn encode(&self, password: &str, hash: &str) -> String;
 }
 
 // List of Hashers:
 
+/// Hasher that uses the PBKDF2 key-derivation function with the SHA256 hashing algorithm.
 pub struct PBKDF2Hasher;
 
 impl Hasher for PBKDF2Hasher {
@@ -44,7 +52,7 @@ impl Hasher for PBKDF2Hasher {
     }
 }
 
-
+/// Hasher that uses the PBKDF2 key-derivation function with the SHA1 hashing algorithm.
 pub struct PBKDF2SHA1Hasher;
 
 impl Hasher for PBKDF2SHA1Hasher {
@@ -71,7 +79,7 @@ impl Hasher for PBKDF2SHA1Hasher {
     }
 }
 
-
+/// Hasher that uses the bcrypt key-derivation function with the password padded with SHA256.
 pub struct BCryptSHA256Hasher;
 
 impl Hasher for BCryptSHA256Hasher {
@@ -96,7 +104,7 @@ impl Hasher for BCryptSHA256Hasher {
     }
 }
 
-
+/// Hasher that uses the bcrypt key-derivation function without password padding.
 pub struct BCryptHasher;
 
 impl Hasher for BCryptHasher {
@@ -119,7 +127,7 @@ impl Hasher for BCryptHasher {
     }
 }
 
-
+/// Hasher that uses the SHA1 hashing function over the salted password.
 pub struct SHA1Hasher;
 
 impl Hasher for SHA1Hasher {
@@ -136,7 +144,7 @@ impl Hasher for SHA1Hasher {
     }
 }
 
-
+/// Hasher that uses the MD5 hashing function over the salted password.
 pub struct MD5Hasher;
 
 impl Hasher for MD5Hasher {
@@ -153,7 +161,7 @@ impl Hasher for MD5Hasher {
     }
 }
 
-
+/// Hasher that uses the SHA1 hashing function with no salting.
 pub struct UnsaltedSHA1Hasher;
 
 impl Hasher for UnsaltedSHA1Hasher {
@@ -169,7 +177,7 @@ impl Hasher for UnsaltedSHA1Hasher {
     }
 }
 
-
+/// Hasher that uses the MD5 hashing function with no salting.
 pub struct UnsaltedMD5Hasher;
 
 impl Hasher for UnsaltedMD5Hasher {

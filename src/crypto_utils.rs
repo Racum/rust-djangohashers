@@ -1,3 +1,5 @@
+//! Set of cryptographic functions to simplify the Hashers.
+
 extern crate rustc_serialize;
 extern crate crypto;
 extern crate bcrypt;
