@@ -1,6 +1,6 @@
 # Rust DjangoHashers
 
-A Rust port of the password primitives used in Django project.
+A Rust port of the password primitives used in [Django Project](https://www.djangoproject.com).
 
 Django's `django.contrib.auth.models.User` class has a few methods to deal with passwords, like `set_password()` and `check_password()`; **DjangoHashers** implements the primitive functions behind that methods. All Django's built-in hashers (except UNIX's `crypt(3)`) are supported.
 
@@ -42,7 +42,7 @@ What is **not** covered:
 
 ### Verifying a Hashed Password
 
-Function signature:
+Function signatures:
 
 ```rust
 pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError> {}
