@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^0.1"
+djangohashers = "0.2.0"
 ```
 
 Reference and import:
@@ -28,6 +28,47 @@ use djangohashers::*;
 // Or, just what you need:
 use djangohashers::{check_password, make_password, Algorithm};
 ```
+
+## Fast PBKDF2 Version
+
+Unfortunately rust-crypto’s implementation of PBKDF2 is not properly optimized: it does not adheres to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
+
+### Instalation
+
+Add the dependency to your `Cargo.toml` declaring the feature:
+
+```toml
+[dependencies.djangohashers]
+version = "0.2.0"
+features = ["fpbkdf2"]
+```
+
+You need to install OpenSSL and set the environment variable to make it visible to the compiler; this changes depending on the operation system and package manager, for example, in OS X with MacPorts you may need to do something like this:
+
+```
+$ sudo port install openssl
+$ CFLAGS="-I/opt/local/include" cargo ...
+```
+
+For other OSs and package managers, [follow the guide](https://cryptography.io/en/latest/installation/) of how to install Python’s **Cryptography** dependencies, that also links against OpenSSL.
+
+### Performance
+
+Method  | Encode or Check | Performance
+------- | --------------- | -------
+Django 1.9.4 | 29.5ms | Baseline
+djangohashers with rust-crypto 0.2.34 (default) | 41.7ms | 41% slower
+djangohashers with fastpbkdf2 0.1.0 | 23.1ms | 28% faster
+
+Notes:
+
+* Best of 5 rounds of 100 events.
+* Built with `--release`.
+* PBKDF2 using SHA256 and iteration count set to 24000.
+* Django version tested with CPython 3.5.1
+* Rust/fastpbkdf2 version tested with Rust 1.6.0 and OpenSSL 1.0.2g.
+* iMac Mid 2010 with an Intel Core i3 3.2Ghz and 16GB of RAM, running OS X 10.11.3.
+
 
 ## Compatibility
 
