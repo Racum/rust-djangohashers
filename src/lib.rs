@@ -60,16 +60,16 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
 }
 
 // Returns an instance of a Hasher based on the algorithm provided.
-fn get_hasher(algorithm: Algorithm) -> Box<Hasher + 'static> {
+fn get_hasher(algorithm: &Algorithm) -> Box<Hasher + 'static> {
     match algorithm {
-        Algorithm::PBKDF2 => Box::new(PBKDF2Hasher),
-        Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
-        Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
-        Algorithm::BCrypt => Box::new(BCryptHasher),
-        Algorithm::SHA1 => Box::new(SHA1Hasher),
-        Algorithm::MD5 => Box::new(MD5Hasher),
-        Algorithm::UnsaltedSHA1 => Box::new(UnsaltedSHA1Hasher),
-        Algorithm::UnsaltedMD5 => Box::new(UnsaltedMD5Hasher),
+        &Algorithm::PBKDF2 => Box::new(PBKDF2Hasher),
+        &Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
+        &Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
+        &Algorithm::BCrypt => Box::new(BCryptHasher),
+        &Algorithm::SHA1 => Box::new(SHA1Hasher),
+        &Algorithm::MD5 => Box::new(MD5Hasher),
+        &Algorithm::UnsaltedSHA1 => Box::new(UnsaltedSHA1Hasher),
+        &Algorithm::UnsaltedMD5 => Box::new(UnsaltedMD5Hasher),
     }
 }
 
@@ -88,7 +88,7 @@ pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError
     }
     match identify_hasher(encoded) {
         Some(algorithm) => {
-            let hasher = get_hasher(algorithm);
+            let hasher = get_hasher(&algorithm);
             hasher.verify(password, encoded)
         }
         None => Err(HasherError::UnknownAlgorithm),
@@ -103,23 +103,105 @@ pub fn check_password_tolerant(password: &str, encoded: &str) -> bool {
     }
 }
 
-/// Generates an encoded hash given a complete set of parameters: password, salt and algorithm.
-/// Since the salt could be hardcoded, use this function only for debug, prefer the
-/// shortcuts `make_password` and `make_password_with_algorithm` instead.
+/// Django Version.
+#[derive(Clone)]
+pub enum Version {
+    /// Current Django version.
+    Current,
+    /// Django 1.4.
+    V14,
+    /// Django 1.5.
+    V15,
+    /// Django 1.6.
+    V16,
+    /// Django 1.7.
+    V17,
+    /// Django 1.8.
+    V18,
+    /// Django 1.9.
+    V19,
+    /// Django 1.10.
+    V110,
+}
+
+/// Resolves the number of iterations based on the Algorithm and the Django Version.
+fn iterations(version: &Version, algorithm: &Algorithm) -> u32 {
+    match algorithm {
+        &Algorithm::BCryptSHA256 | &Algorithm::BCrypt => 12,
+        &Algorithm::PBKDF2 | &Algorithm::PBKDF2SHA1 => match version {
+            &Version::V14 | &Version::V15 => 10000,
+            &Version::V16 | &Version::V17 => 12000,
+            &Version::V18 => 20000,
+            &Version::V19 | &Version::Current => 24000,
+            &Version::V110 => 30000,
+        },
+        _ => 1,
+    }
+}
+
+/// Generates a random salt.
+fn random_salt() -> String {
+    rand::thread_rng().gen_ascii_chars().take(12).collect::<String>()
+}
+
+/// Core function that generates all combinations of passwords:
+pub fn make_password_core(password: &str, salt: &str, algorithm: Algorithm, version: Version) -> String {
+    let hasher = get_hasher(&algorithm);
+    hasher.encode(password, salt, iterations(&version, &algorithm))
+}
+
+/// Based on the current Django version, generates an encoded hash given
+/// a complete set of parameters: password, salt and algorithm.
 pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algorithm) -> String {
-    let hasher = get_hasher(algorithm);
-    hasher.encode(password, salt)
+    make_password_core(password, salt, algorithm, Version::Current)
 }
 
-/// Generates an encoded hash given a password and algorithm, uses a random salt.
+/// Based on the current Django version, generates an encoded hash given
+/// a password and algorithm, uses a random salt.
 pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> String {
-    let salt = rand::thread_rng().gen_ascii_chars().take(12).collect::<String>();
-    make_password_with_settings(password, &salt, algorithm)
+    make_password_core(password, &random_salt(), algorithm, Version::Current)
 }
 
-/// Generates an encoded hash given only a password, uses a random salt and the PBKDF2 algorithm.
+/// Based on the current Django version, generates an encoded hash given
+/// only a password, uses a random salt and the PBKDF2 algorithm.
 pub fn make_password(password: &str) -> String {
-    make_password_with_algorithm(password, Algorithm::PBKDF2)
+    make_password_core(password, &random_salt(), Algorithm::PBKDF2, Version::Current)
+}
+
+/// Abstraction that exposes the functions that generates
+/// passwords compliant with different Django versions.
+///
+/// # Example:
+///
+/// ```
+/// let django = Django {version: Version::V19};
+/// let encoded = django.make_password("KRONOS");
+/// ```
+pub struct Django {
+    /// Django Version.
+    pub version: Version
+}
+
+impl Django {
+
+    /// Based on the defined Django version, generates an encoded hash given
+    /// a complete set of parameters: password, salt and algorithm.
+    pub fn make_password_with_settings(&self, password: &str, salt: &str, algorithm: Algorithm) -> String {
+        make_password_core(password, salt, algorithm, self.version.clone())
+    }
+
+    /// Based on the defined Django version, generates an encoded hash given
+    /// a password and algorithm, uses a random salt.
+    pub fn make_password_with_algorithm(&self, password: &str, algorithm: Algorithm) -> String {
+        make_password_core(password, &random_salt(), algorithm, self.version.clone())
+    }
+
+    /// Based on the defined Django version, generates an encoded hash given
+    /// only a password, uses a random salt and the PBKDF2 algorithm.
+    pub fn make_password(&self, password: &str) -> String {
+        make_password_core(password, &random_salt(), Algorithm::PBKDF2, self.version.clone())
+    }
+
 }
 
 #[test]

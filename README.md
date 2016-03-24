@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.2.0"
+djangohashers = "0.2.1"
 ```
 
 Reference and import:
@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "0.2.0"
+version = "0.2.1"
 features = ["fpbkdf2"]
 ```
 
@@ -177,6 +177,35 @@ let encoded = make_password_with_settings("KRONOS", "seasalt", Algorithm::PBKDF2
 // Returns exactly this (remember, the salt is fixed!):
 // pbkdf2_sha1$24000$seasalt$F+kiWNHXbMBcwgxsvSKFCWHnZZ0=
 ```
+
+### Generating a Hashed Password based on a Django version
+
+> New in `0.2.1`.
+
+Django versions can have different number of iterations for hashers based on PBKDF2 and BCrypt algorithms; this abstraction makes possible to generate a password with the same number of iterations used in that versions.
+
+```rust
+use djangohashers::{Django, Version};
+
+let django = Django {version: Version::V18};  // Django 1.8.
+let encoded = django.make_password("KRONOS");
+// Returns something like:
+// pbkdf2_sha256$20000$u0C1E8jrnAYx$7KIo/fAuBJpswQyL7pTxO06ccrSjGdIe7iSqzdVub1w=
+//               |||||
+// ...notice the 20000 iteractions, used in Django 1.8.q
+```
+
+Available versions:
+
+* `Version::Current`
+* `Version::V14`
+* `Version::V15`
+* `Version::V16`
+* `Version::V17`
+* `Version::V18`
+* `Version::V19`
+* `Version::V110`
+
 
 ### Verifying a Hash Format (pre-crypto)
 

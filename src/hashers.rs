@@ -1,9 +1,5 @@
 use crypto_utils;
 
-// Django 1.9 defaults:
-const PBKDF2_ITERATIONS: u32 = 24000;
-const BCRYPT_ROUNDS: u32 = 12;
-
 /// Possible errors during a hash creation.
 #[derive(PartialEq, Debug)]
 pub enum HasherError {
@@ -20,7 +16,7 @@ pub trait Hasher {
     /// Verifies a password against an encoded hash.
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError>;
     /// Generates an encoded hash for a given password and salt.
-    fn encode(&self, password: &str, hash: &str) -> String;
+    fn encode(&self, password: &str, hash: &str, iterations: u32) -> String;
 }
 
 // List of Hashers:
@@ -45,8 +41,7 @@ impl Hasher for PBKDF2Hasher {
         Ok(hash == crypto_utils::hash_pbkdf2_sha256(password, salt, iterations))
     }
 
-    fn encode(&self, password: &str, salt: &str) -> String {
-        let iterations = PBKDF2_ITERATIONS;
+    fn encode(&self, password: &str, salt: &str, iterations: u32) -> String {
         let hash = crypto_utils::hash_pbkdf2_sha256(password, salt, iterations);
         format!("{}${}${}${}", "pbkdf2_sha256", iterations, salt, hash)
     }
@@ -72,8 +67,7 @@ impl Hasher for PBKDF2SHA1Hasher {
         Ok(hash == crypto_utils::hash_pbkdf2_sha1(password, salt, iterations))
     }
 
-    fn encode(&self, password: &str, salt: &str) -> String {
-        let iterations = PBKDF2_ITERATIONS;
+    fn encode(&self, password: &str, salt: &str, iterations: u32) -> String {
         let hash = crypto_utils::hash_pbkdf2_sha1(password, salt, iterations);
         format!("{}${}${}${}", "pbkdf2_sha1", iterations, salt, hash)
     }
@@ -97,9 +91,9 @@ impl Hasher for BCryptSHA256Hasher {
         }
     }
 
-    fn encode(&self, password: &str, _: &str) -> String {
+    fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
         let hashed_password = crypto_utils::hash_sha256(password);
-        let hash = crypto_utils::hash_bcrypt(&hashed_password, BCRYPT_ROUNDS).unwrap();
+        let hash = crypto_utils::hash_bcrypt(&hashed_password, iterations).unwrap();
         format!("{}${}", "bcrypt_sha256", hash)
     }
 }
@@ -121,8 +115,8 @@ impl Hasher for BCryptHasher {
         }
     }
 
-    fn encode(&self, password: &str, _: &str) -> String {
-        let hash = crypto_utils::hash_bcrypt(password, BCRYPT_ROUNDS).unwrap();
+    fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
+        let hash = crypto_utils::hash_bcrypt(password, iterations).unwrap();
         format!("{}${}", "bcrypt", hash)
     }
 }
@@ -138,7 +132,7 @@ impl Hasher for SHA1Hasher {
         Ok(hash == crypto_utils::hash_sha1(password, salt))
     }
 
-    fn encode(&self, password: &str, salt: &str) -> String {
+    fn encode(&self, password: &str, salt: &str, _: u32) -> String {
         let hash = crypto_utils::hash_sha1(password, salt);
         format!("{}${}${}", "sha1", salt, hash)
     }
@@ -155,7 +149,7 @@ impl Hasher for MD5Hasher {
         Ok(hash == crypto_utils::hash_md5(password, salt))
     }
 
-    fn encode(&self, password: &str, salt: &str) -> String {
+    fn encode(&self, password: &str, salt: &str, _: u32) -> String {
         let hash = crypto_utils::hash_md5(password, salt);
         format!("{}${}${}", "md5", salt, hash)
     }
@@ -171,7 +165,7 @@ impl Hasher for UnsaltedSHA1Hasher {
         Ok(hash == crypto_utils::hash_sha1(password, ""))
     }
 
-    fn encode(&self, password: &str, _: &str) -> String {
+    fn encode(&self, password: &str, _: &str, _: u32) -> String {
         let hash = crypto_utils::hash_sha1(password, "");
         format!("{}$${}", "sha1", hash)
     }
@@ -185,7 +179,7 @@ impl Hasher for UnsaltedMD5Hasher {
         Ok(encoded == crypto_utils::hash_md5(password, ""))
     }
 
-    fn encode(&self, password: &str, _: &str) -> String {
+    fn encode(&self, password: &str, _: &str, _: u32) -> String {
         crypto_utils::hash_md5(password, "").to_string()
     }
 }
