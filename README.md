@@ -192,7 +192,7 @@ let encoded = django.make_password("KRONOS");
 // Returns something like:
 // pbkdf2_sha256$20000$u0C1E8jrnAYx$7KIo/fAuBJpswQyL7pTxO06ccrSjGdIe7iSqzdVub1w=
 //               |||||
-// ...notice the 20000 iteractions, used in Django 1.8.
+// ...notice the 20000 iterations, used in Django 1.8.
 ```
 
 Available versions:
