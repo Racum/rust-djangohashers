@@ -103,8 +103,21 @@ fn test_unsalted_sha1() {
     assert!(!check_password(" ", &blank_encoded).unwrap());
 }
 
-// Hasher based on UNIX's crypt(3) not implemented:
-// - test_crypt
+#[test]
+fn test_crypt() {
+    let django = Django {version: Version::V19};
+    let encoded = django.make_password_with_settings("lètmei", "ab", Algorithm::Crypt);
+    assert!(encoded == "crypt$$ab1Hv2Lg7ltQo".to_string());
+    assert!(is_password_usable(&encoded));
+    assert!(check_password("lètmei", &encoded).unwrap());
+    assert!(!check_password("lètmeiz", &encoded).unwrap());
+    // Blank passwords
+    let blank_encoded = django.make_password_with_settings("", "ab", Algorithm::Crypt);
+    assert!(blank_encoded.starts_with("crypt$"));
+    assert!(is_password_usable(&blank_encoded));
+    assert!(check_password("", &blank_encoded).unwrap());
+    assert!(!check_password(" ", &blank_encoded).unwrap());
+}
 
 #[test]
 fn test_bcrypt_sha256() {

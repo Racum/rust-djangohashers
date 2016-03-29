@@ -70,6 +70,14 @@ fn test_bcrypt() {
 }
 
 #[test]
+fn test_crypt() {
+    let encoded = make_password_core(PASSWORD, SALT, Algorithm::Crypt, Version::V19);
+    assert!(check_password(PASSWORD, &encoded).unwrap());
+    let h = "crypt$$KQW3RFkgPSuuA";
+    assert!(check_password(PASSWORD, h).unwrap());
+}
+
+#[test]
 fn test_is_password_usable() {
     // Good hashes:
     assert!(is_password_usable("pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU="));

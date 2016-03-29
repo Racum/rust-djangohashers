@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.2.1"
+djangohashers = "0.2.2"
 ```
 
 Reference and import:
@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "0.2.1"
+version = "0.2.2"
 features = ["fpbkdf2"]
 ```
 
@@ -76,7 +76,6 @@ DjangoHashers passes all relevant unit tests from Django 1.9, there is even a [l
 
 What is **not** covered:
 
-* `CryptPasswordHasher`, that uses UNIX's `crypt(3)` hash function.
 * Upgrade/Downgrade callbacks.
 * Any 3rd-party hasher outside Django's code.
 * Some tests that makes no sense in idiomatic Rust.
@@ -151,6 +150,7 @@ Available algorithms:
 * `Algorithm::MD5`
 * `Algorithm::UnsaltedSHA1`
 * `Algorithm::UnsaltedMD5`
+* `Algorithm::Crypt`
 
 The algorithms follow the same Django naming model, minus the `PasswordHasher` suffix.
 

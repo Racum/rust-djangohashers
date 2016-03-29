@@ -3,6 +3,7 @@
 extern crate rustc_serialize;
 extern crate crypto;
 extern crate bcrypt;
+extern crate pwhash;
 
 #[cfg(fpbkdf2)]
 extern crate fastpbkdf2;
@@ -12,6 +13,7 @@ use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use self::crypto::sha1::Sha1;
 use self::crypto::md5::Md5;
+use self::pwhash::unix_crypt::hash_with;
 
 #[cfg(not(fpbkdf2))]
 use self::crypto::hmac::Hmac;
@@ -71,4 +73,11 @@ pub fn hash_md5(password: &str, salt: &str) -> String {
     md5.input_str(salt);
     md5.input_str(password);
     md5.result_str()
+}
+
+pub fn hash_unix_crypt(password: &str, salt: &str) -> String {
+    match hash_with(salt, password) {
+        Ok(value) => value,
+        Err(_) => "".to_string()
+    }
 }

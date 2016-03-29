@@ -2,8 +2,7 @@
 //!
 //! Django's `django.contrib.auth.models.User` class has a few methods to deal with passwords,
 //! like `set_password()` and `check_password()`; **DjangoHashers** implements the primitive
-//! functions behind that methods. All Django's built-in hashers (except UNIX's `crypt(3)`)
-//! are supported.
+//! functions behind that methods. All Django's built-in hashers are supported.
 //!
 //! This library was conceived for Django integration, but is not limited to it; you can use
 //! the password hash algorithm in any Rust project (or FFI integration), since its security
@@ -36,6 +35,8 @@ pub enum Algorithm {
     UnsaltedSHA1,
     /// MD5 hashing function with no salting.
     UnsaltedMD5,
+    /// UNIX's crypt(3) hashing algorithm.
+    Crypt,
 }
 
 // Parses an encoded hash in order to detect the algorithm, returns it in an Option.
@@ -54,6 +55,7 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
             "bcrypt" => Some(Algorithm::BCrypt),
             "sha1" => Some(Algorithm::SHA1),
             "md5" => Some(Algorithm::MD5),
+            "crypt" => Some(Algorithm::Crypt),
             _ => None,
         }
     }
@@ -70,6 +72,7 @@ fn get_hasher(algorithm: &Algorithm) -> Box<Hasher + 'static> {
         &Algorithm::MD5 => Box::new(MD5Hasher),
         &Algorithm::UnsaltedSHA1 => Box::new(UnsaltedSHA1Hasher),
         &Algorithm::UnsaltedMD5 => Box::new(UnsaltedMD5Hasher),
+        &Algorithm::Crypt => Box::new(CryptHasher),
     }
 }
 
@@ -206,31 +209,33 @@ impl Django {
 
 #[test]
 fn test_identify_hasher() {
+
     // Good hashes:
-    assert!(identify_hasher("pbkdf2_sha256$24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395\
-                             nZatXTJpEtTY=")
+    assert!(identify_hasher("pbkdf2_sha256$24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=")
                 .unwrap() == Algorithm::PBKDF2);
     assert!(identify_hasher("pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU=")
                 .unwrap() == Algorithm::PBKDF2SHA1);
     assert!(identify_hasher("sha1$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00")
                 .unwrap() == Algorithm::SHA1);
-    assert!(identify_hasher("md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e").unwrap() ==
-            Algorithm::MD5);
-    assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad679119").unwrap() == Algorithm::UnsaltedMD5);
-    assert!(identify_hasher("md5$$7cf6409a82cd4c8b96a9ecf6ad679119").unwrap() ==
-            Algorithm::UnsaltedMD5);
-    assert!(identify_hasher("sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7").unwrap() ==
-            Algorithm::UnsaltedSHA1);
-    assert!(identify_hasher("bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPes\
-                             a1EyXVcTXK")
+    assert!(identify_hasher("md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e")
+                .unwrap() == Algorithm::MD5);
+    assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad679119")
+                .unwrap() == Algorithm::UnsaltedMD5);
+    assert!(identify_hasher("md5$$7cf6409a82cd4c8b96a9ecf6ad679119")
+                .unwrap() ==Algorithm::UnsaltedMD5);
+    assert!(identify_hasher("sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7")
+                .unwrap() == Algorithm::UnsaltedSHA1);
+    assert!(identify_hasher("bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPesa1EyXVcTXK")
                 .unwrap() == Algorithm::BCryptSHA256);
-    assert!(identify_hasher("bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6\
-                             Y/.")
+    assert!(identify_hasher("bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6Y/.")
                 .unwrap() == Algorithm::BCrypt);
+    assert!(identify_hasher("crypt$$ab1Hv2Lg7ltQo")
+                .unwrap() == Algorithm::Crypt);
+
     // Bad hashes:
     assert!(identify_hasher("").is_none());
     assert!(identify_hasher("password").is_none());
     assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad6791190").is_none());
-    assert!(identify_hasher("blah$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00")
-                .is_none());
+    assert!(identify_hasher("blah$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00").is_none());
+
 }

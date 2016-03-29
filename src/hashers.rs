@@ -16,7 +16,7 @@ pub trait Hasher {
     /// Verifies a password against an encoded hash.
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError>;
     /// Generates an encoded hash for a given password and salt.
-    fn encode(&self, password: &str, hash: &str, iterations: u32) -> String;
+    fn encode(&self, password: &str, salt: &str, iterations: u32) -> String;
 }
 
 // List of Hashers:
@@ -181,5 +181,21 @@ impl Hasher for UnsaltedMD5Hasher {
 
     fn encode(&self, password: &str, _: &str, _: u32) -> String {
         crypto_utils::hash_md5(password, "").to_string()
+    }
+}
+
+/// Hasher that uses the UNIX's crypt(3) hash function.
+pub struct CryptHasher;
+
+impl Hasher for CryptHasher {
+    fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
+        let encoded_part: Vec<&str> = encoded.split("$").collect();
+        let hash = encoded_part[2];
+        Ok(hash == crypto_utils::hash_unix_crypt(password, hash))
+    }
+
+    fn encode(&self, password: &str, salt: &str, _: u32) -> String {
+        let hash = crypto_utils::hash_unix_crypt(password, salt);
+        format!("{}$${}", "crypt", hash)
     }
 }
