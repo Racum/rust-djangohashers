@@ -1,8 +1,5 @@
-#[macro_use]
-extern crate quickcheck;
-extern crate rand;
+#[macro_use] extern crate quickcheck;
 extern crate djangohashers;
-extern crate regex;
 
 #[cfg(feature = "fuzzy_tests")]
 mod fuzzy_tests {
