@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.2.3"
+djangohashers = "0.2.4"
 ```
 
 Reference and import:
@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "0.2.3"
+version = "0.2.4"
 features = ["fpbkdf2"]
 ```
 
@@ -177,6 +177,8 @@ let encoded = make_password_with_settings("KRONOS", "seasalt", Algorithm::PBKDF2
 // Returns exactly this (remember, the salt is fixed!):
 // pbkdf2_sha1$24000$seasalt$F+kiWNHXbMBcwgxsvSKFCWHnZZ0=
 ```
+
+**Warning**: `make_password_with_settings` and `make_password_core` will both panic if salt is not only letters and numbers (`^[A-Za-z0-9]*$`).
 
 ### Generating a Hashed Password based on a Django version
 

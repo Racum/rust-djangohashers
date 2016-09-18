@@ -43,8 +43,7 @@ pub enum Algorithm {
 
 // Parses an encoded hash in order to detect the algorithm, returns it in an Option.
 fn identify_hasher(encoded: &str) -> Option<Algorithm> {
-    if (encoded.len() == 32 && !encoded.contains("$")) ||
-       (encoded.len() == 37 && encoded.starts_with("md5$$")) {
+    if encoded.len() == 32 && !encoded.contains("$") {
         Some(Algorithm::UnsaltedMD5)
     } else if encoded.len() == 46 && encoded.starts_with("sha1$$") {
         Some(Algorithm::UnsaltedSHA1)
@@ -226,7 +225,7 @@ fn test_identify_hasher() {
     assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad679119")
                 .unwrap() == Algorithm::UnsaltedMD5);
     assert!(identify_hasher("md5$$7cf6409a82cd4c8b96a9ecf6ad679119")
-                .unwrap() ==Algorithm::UnsaltedMD5);
+                .unwrap() == Algorithm::MD5);
     assert!(identify_hasher("sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7")
                 .unwrap() == Algorithm::UnsaltedSHA1);
     assert!(identify_hasher("bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPesa1EyXVcTXK")

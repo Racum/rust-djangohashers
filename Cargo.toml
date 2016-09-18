@@ -1,6 +1,6 @@
 [package]
 name = "djangohashers"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 license = "BSD-3-Clause"
 readme = "README.md"
