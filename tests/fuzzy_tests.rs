@@ -32,11 +32,15 @@ mod fuzzy_tests {
         }
     }
 
-    //quickcheck! {
-    //    fn test_fuzzy_bcrypt(pwd: String, salt: String) -> TestResult {
-    //        check_algorithm(pwd, salt, Algorithm::BCrypt)
-    //    }
-    //}
+    quickcheck! {
+        fn test_fuzzy_bcrypt(pwd: String, salt: String) -> TestResult {
+            if pwd.len() >= 72 {
+                return TestResult::discard();
+            }
+
+            check_algorithm(pwd, salt, Algorithm::BCrypt)
+        }
+    }
 
     quickcheck! {
         fn test_fuzzy_sha1(pwd: String, salt: String) -> TestResult {
