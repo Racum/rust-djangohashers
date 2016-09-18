@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.3] - 2016-09-18
+
+### Changed
+
+- Function make_password_core now panics with Invalid salt.
+
 ## [0.2.2] - 2016-03-29
 
 ### Added

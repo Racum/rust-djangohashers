@@ -9,10 +9,12 @@
 //! model is already battle-tested.
 
 extern crate rand;
+extern crate regex;
 
 use rand::Rng;
 mod crypto_utils;
 mod hashers;
+use regex::Regex;
 
 pub use hashers::*;
 
@@ -149,6 +151,8 @@ fn random_salt() -> String {
 
 /// Core function that generates all combinations of passwords:
 pub fn make_password_core(password: &str, salt: &str, algorithm: Algorithm, version: Version) -> String {
+    let valid_salt_re = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
+    assert!(valid_salt_re.is_match(salt), "Salt can only contain letters and numbers.");
     let hasher = get_hasher(&algorithm);
     hasher.encode(password, salt, iterations(&version, &algorithm))
 }
@@ -238,4 +242,10 @@ fn test_identify_hasher() {
     assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad6791190").is_none());
     assert!(identify_hasher("blah$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00").is_none());
 
+}
+
+#[test]
+#[should_panic]
+fn test_invalid_salt_should_panic() {
+    let _ = make_password_core("pass", "$alt", Algorithm::PBKDF2, Version::Current);
 }
