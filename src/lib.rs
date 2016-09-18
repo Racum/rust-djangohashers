@@ -10,6 +10,7 @@
 
 extern crate rand;
 extern crate regex;
+#[macro_use] extern crate lazy_static;
 
 use rand::Rng;
 mod crypto_utils;
@@ -148,10 +149,13 @@ fn random_salt() -> String {
     rand::thread_rng().gen_ascii_chars().take(12).collect::<String>()
 }
 
+lazy_static! {
+    pub static ref VALID_SALT_RE: Regex = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
+}
+
 /// Core function that generates all combinations of passwords:
 pub fn make_password_core(password: &str, salt: &str, algorithm: Algorithm, version: Version) -> String {
-    let valid_salt_re = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
-    assert!(valid_salt_re.is_match(salt), "Salt can only contain letters and numbers.");
+    assert!(VALID_SALT_RE.is_match(salt), "Salt can only contain letters and numbers.");
     let hasher = get_hasher(&algorithm);
     hasher.encode(password, salt, iterations(&version, &algorithm))
 }

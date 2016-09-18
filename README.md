@@ -4,11 +4,11 @@
 
 A Rust port of the password primitives used in [Django Project](https://www.djangoproject.com).
 
-Django's `django.contrib.auth.models.User` class has a few methods to deal with passwords, like `set_password()` and `check_password()`; **DjangoHashers** implements the primitive functions behind that methods. All Django's built-in hashers are supported.
+Django's `django.contrib.auth.models.User` class has a few methods to deal with passwords, like `set_password()` and `check_password()`; **DjangoHashers** implements the primitive functions behind those methods. All Django's built-in hashers are supported.
 
 This library was conceived for Django integration, but is not limited to it; you can use the password hash algorithm in any Rust project (or FFI integration), since its security model is already battle-tested.
 
-## Instalation
+## Installation
 
 Add the dependency to your `Cargo.toml`:
 
@@ -31,9 +31,9 @@ use djangohashers::{check_password, make_password, Algorithm};
 
 ## Fast PBKDF2 Version
 
-Unfortunately rust-crypto’s implementation of PBKDF2 is not properly optimized: it does not adheres to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
+Unfortunately rust-crypto’s implementation of PBKDF2 is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
 
-### Instalation
+### Installation
 
 Add the dependency to your `Cargo.toml` declaring the feature:
 
