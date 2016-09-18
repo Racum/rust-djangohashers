@@ -8,11 +8,9 @@ extern crate regex;
 mod fuzzy_tests {
     use djangohashers::*;
     use quickcheck::TestResult;
-    use regex::Regex;
 
     fn check_algorithm(pwd: String, salt: String, algorithm: Algorithm) -> TestResult {
-        let valid_salt_re = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
-        if !valid_salt_re.is_match(&salt) {
+        if !VALID_SALT_RE.is_match(&salt) {
             return TestResult::discard();
         }
 
