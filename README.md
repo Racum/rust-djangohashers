@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.2.4"
+djangohashers = "0.2.5"
 ```
 
 Reference and import:
@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "0.2.4"
+version = "0.2.5"
 features = ["fpbkdf2"]
 ```
 
@@ -82,7 +82,7 @@ What is **not** covered:
 
 ## Usage
 
-[API Documentation](https://crates.fyi/crates/djangohashers/0.1.0/), thanks to **crates.fyi** project!
+[API Documentation](https://docs.rs/djangohashers/), thanks to **docs.rs** project!
 
 ### Verifying a Hashed Password
 
