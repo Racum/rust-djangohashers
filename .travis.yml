@@ -5,3 +5,4 @@ rust:
 script:
   - cargo test --verbose
   - cargo test --verbose --features fpbkdf2
+  - cargo test --verbose --release --features "fpbkdf2 fuzzy_tests"
