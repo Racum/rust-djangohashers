@@ -7,6 +7,7 @@ license = "BSD-3-Clause"
 readme = "README.md"
 repository = "https://github.com/racum/rust-djangohashers"
 keywords = ["hash", "password", "python", "django", "crypto"]
+categories = ["algorithms", "authentication", "cryptography"]
 description = "A Rust port of the password primitives used in Django project."
 
 [lib]
