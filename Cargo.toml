@@ -1,10 +1,11 @@
 [package]
 name = "djangohashers"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 documentation = "https://docs.rs/djangohashers/"
 license = "BSD-3-Clause"
 readme = "README.md"
+homepage = "https://github.com/racum/rust-djangohashers"
 repository = "https://github.com/racum/rust-djangohashers"
 keywords = ["hash", "password", "python", "django", "crypto"]
 categories = ["algorithms", "authentication", "cryptography"]
@@ -29,6 +30,7 @@ pwhash = "^0.1"
 regex = "^0.2"
 fastpbkdf2 = { version = "0.1.0", optional = true }
 lazy_static = "^0.2"
+cargon = "0.0.1"
 
 [dev-dependencies]
 quickcheck = "^0.4"

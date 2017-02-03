@@ -27,6 +27,12 @@ mod fuzzy_tests {
     }
 
     quickcheck! {
+        fn test_fuzzy_argon2(pwd: String, salt: String) -> TestResult {
+            check_algorithm(pwd, salt, Algorithm::Argon2)
+        }
+    }
+
+    quickcheck! {
         fn test_fuzzy_bcryptsha256(pwd: String, salt: String) -> TestResult {
             check_algorithm(pwd, salt, Algorithm::BCryptSHA256)
         }

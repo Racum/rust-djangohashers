@@ -4,11 +4,13 @@ extern crate rustc_serialize;
 extern crate crypto;
 extern crate bcrypt;
 extern crate pwhash;
+extern crate cargon;
 
 #[cfg(fpbkdf2)]
 extern crate fastpbkdf2;
 
-use self::rustc_serialize::base64::{STANDARD, ToBase64};
+use std::ptr;
+use self::rustc_serialize::base64::{STANDARD, URL_SAFE, ToBase64, FromBase64};
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use self::crypto::sha1::Sha1;
@@ -80,4 +82,30 @@ pub fn hash_unix_crypt(password: &str, salt: &str) -> String {
         Ok(value) => value,
         Err(_) => "".to_string()
     }
+}
+
+pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32, parallelism: u32) -> String {
+    let salt_bytes = salt.from_base64().unwrap();
+    let argon2i_type: usize = 1;
+    let empty_value = &[];
+    let mut result = [0u8; 16];
+    let mut context = cargon::CargonContext {
+        version: 0x13,
+        t_cost: time_cost,
+        m_cost: memory_cost,
+        lanes: parallelism,
+        out: result.as_mut_ptr(), outlen: result.len() as u32,
+        pwd: password.as_bytes().as_ptr(), pwdlen: password.as_bytes().len() as u32,
+        salt: salt_bytes.as_ptr(), saltlen: salt_bytes.len() as u32,
+        secret: empty_value.as_ptr(), secretlen: empty_value.len() as u32,
+        ad: empty_value.as_ptr(), adlen: empty_value.len() as u32,
+        threads: parallelism,
+        allocate_fptr: ptr::null(),
+        deallocate_fptr: ptr::null(),
+        flags: cargon::ARGON2_FLAG_CLEAR_MEMORY,
+    };
+    unsafe {
+        cargon::argon2_ctx(&mut context, argon2i_type);
+    }
+    result.to_base64(URL_SAFE)
 }

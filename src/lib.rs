@@ -26,6 +26,8 @@ pub enum Algorithm {
     PBKDF2,
     /// PBKDF2 key-derivation function with the SHA1 hashing algorithm.
     PBKDF2SHA1,
+    /// Argon2 key-derivation function.
+    Argon2,
     /// Bcrypt key-derivation function with the password padded with SHA256.
     BCryptSHA256,
     /// Bcrypt key-derivation function without password padding.
@@ -53,6 +55,7 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
         match encoded_part[0] {
             "pbkdf2_sha256" => Some(Algorithm::PBKDF2),
             "pbkdf2_sha1" => Some(Algorithm::PBKDF2SHA1),
+            "argon2" => Some(Algorithm::Argon2),
             "bcrypt_sha256" => Some(Algorithm::BCryptSHA256),
             "bcrypt" => Some(Algorithm::BCrypt),
             "sha1" => Some(Algorithm::SHA1),
@@ -68,6 +71,7 @@ fn get_hasher(algorithm: &Algorithm) -> Box<Hasher + 'static> {
     match algorithm {
         &Algorithm::PBKDF2 => Box::new(PBKDF2Hasher),
         &Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
+        &Algorithm::Argon2 => Box::new(Argon2Hasher),
         &Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
         &Algorithm::BCrypt => Box::new(BCryptHasher),
         &Algorithm::SHA1 => Box::new(SHA1Hasher),
@@ -127,6 +131,8 @@ pub enum Version {
     V19,
     /// Django 1.10.
     V110,
+    /// Django 1.11.
+    V111,
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -137,9 +143,11 @@ fn iterations(version: &Version, algorithm: &Algorithm) -> u32 {
             &Version::V14 | &Version::V15 => 10000,
             &Version::V16 | &Version::V17 => 12000,
             &Version::V18 => 20000,
-            &Version::V19 | &Version::Current => 24000,
-            &Version::V110 => 30000,
+            &Version::V19 => 24000,
+            &Version::V110 | &Version::Current => 30000,
+            &Version::V111 => 36000,
         },
+        &Algorithm::Argon2 => 1,  // For Argon2, this means "Profile 1", not actually "1 integration".
         _ => 1,
     }
 }
@@ -238,6 +246,8 @@ fn test_identify_hasher() {
                 .unwrap() == Algorithm::BCrypt);
     assert!(identify_hasher("crypt$$ab1Hv2Lg7ltQo")
                 .unwrap() == Algorithm::Crypt);
+    assert!(identify_hasher("argon2$argon2i$v=19$m=512,t=2,p=2$MktOZjRsaTBNWnVp$/s1VqdEUfHOPKJyIokwa2A")
+                .unwrap() == Algorithm::Argon2);
 
     // Bad hashes:
     assert!(identify_hasher("").is_none());

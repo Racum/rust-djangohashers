@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.2.5"
+djangohashers = "0.2.6"
 ```
 
 Reference and import:
@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "0.2.5"
+version = "0.2.6"
 features = ["fpbkdf2"]
 ```
 
@@ -144,6 +144,7 @@ Available algorithms:
 
 * `Algorithm::PBKDF2` (default)
 * `Algorithm::PBKDF2SHA1`
+* `Algorithm::Argon2`
 * `Algorithm::BCryptSHA256`
 * `Algorithm::BCrypt`
 * `Algorithm::SHA1`
@@ -199,7 +200,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `Version::Current` Current Django version (`1.9` for DjangoHashers `0.2.1`).
+* `Version::Current` Current Django version (`1.10` for DjangoHashers `0.2.6`).
 * `Version::V14` Django 1.4
 * `Version::V15` Django 1.5
 * `Version::V16` Django 1.6
@@ -207,6 +208,7 @@ Available versions:
 * `Version::V18` Django 1.8
 * `Version::V19` Django 1.9
 * `Version::V110` Django 1.10
+* `Version::V111` Django 1.11
 
 
 ### Verifying a Hash Format (pre-crypto)

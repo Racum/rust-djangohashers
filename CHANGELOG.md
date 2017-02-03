@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.6] - 2017-02-04
+
+### Added
+
+- Support to Argon2PasswordHasher.
+- Support to Django 1.11.
+
+### Changed
+
+- Set default Django version to 1.10.
+- Updated dependencies.
+
 ## [0.2.5] - 2016-09-19
 
 ### Added
