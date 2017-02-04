@@ -127,6 +127,8 @@ Possible Errors:
 * `HasherError::UnknownAlgorithm`: anything not recognizable as an algorithm.
 * `HasherError::InvalidIterations`: number of iterations is not a positive integer.
 * `HasherError::EmptyHash`: hash string is empty.
+* `HasherError::InvalidArgon2Salt`: Argon2 salt should be Base64 encoded.
+
 
 If you want to automatically assume all errors as *"invalid password"*, there is a shortcut for that:
 

@@ -1,3 +1,6 @@
+extern crate rustc_serialize;
+use self::rustc_serialize::base64::FromBase64;
+use std::str;
 use crypto_utils;
 
 /// Possible errors during a hash creation.
@@ -9,6 +12,8 @@ pub enum HasherError {
     EmptyHash,
     /// Hash string is empty.
     InvalidIterations,
+    /// Argon2 salt should be Base64 encoded.
+    InvalidArgon2Salt,
 }
 
 /// Hasher abstraction, providing methods to encode and verify hashes.
@@ -87,6 +92,13 @@ impl Hasher for Argon2Hasher {
         let memory_cost: u32 = settings_part[0].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
         let time_cost: u32 = settings_part[1].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
         let parallelism: u32 = settings_part[2].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
+
+        // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
+        match salt.from_base64() {
+            Ok(_) => {},
+            Err(_) => return Err(HasherError::InvalidArgon2Salt)
+        };
+
         Ok(hash == crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism))
     }
 

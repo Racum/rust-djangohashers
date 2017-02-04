@@ -5,6 +5,9 @@ extern crate djangohashers;
 mod fuzzy_tests {
     use djangohashers::*;
     use quickcheck::TestResult;
+    extern crate rustc_serialize;
+
+    use self::rustc_serialize::base64::{URL_SAFE, ToBase64};
 
     fn check_algorithm(pwd: String, salt: String, algorithm: Algorithm) -> TestResult {
         if !VALID_SALT_RE.is_match(&salt) {
@@ -28,7 +31,7 @@ mod fuzzy_tests {
 
     quickcheck! {
         fn test_fuzzy_argon2(pwd: String, salt: String) -> TestResult {
-            check_algorithm(pwd, salt, Algorithm::Argon2)
+            check_algorithm(pwd, salt.as_bytes().to_base64(URL_SAFE), Algorithm::Argon2)
         }
     }
 

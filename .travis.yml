@@ -3,6 +3,6 @@ rust:
   - stable
   - nightly
 script:
-  - cargo test --verbose
-  - cargo test --verbose --features fpbkdf2
-  - cargo test --verbose --release --features "fpbkdf2 fuzzy_tests"
+  - cargo test --verbose --no-fail-fast
+  - cargo test --verbose --no-fail-fast --features fpbkdf2
+  - cargo test --verbose --no-fail-fast --features "fpbkdf2 fuzzy_tests" --release
