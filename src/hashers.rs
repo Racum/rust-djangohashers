@@ -81,13 +81,20 @@ impl Hasher for PBKDF2SHA1Hasher {
 /// Hasher that uses the Argon2 function (new in Django 1.10).
 pub struct Argon2Hasher;
 
+const OLD_ARGON2_VERSION: u32 = 0x10;
+const NEW_ARGON2_VERSION: u32 = 0x13;
+
 impl Hasher for Argon2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        // TODO: Use a more reliable way to parse the encoded string:
         let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let settings = encoded_part[3];
-        let salt = encoded_part[4];
-        let hash = encoded_part[5];
+        let segment_shift = 6 - encoded_part.len();
+        let settings = encoded_part[3 - segment_shift];
+        let salt = encoded_part[4 - segment_shift];
+        let hash = encoded_part[5 - segment_shift];
+        let version = match segment_shift {
+            0 => NEW_ARGON2_VERSION,
+            _ => OLD_ARGON2_VERSION,
+        };
         let settings_part: Vec<&str> = settings.split(",").collect();
         let memory_cost: u32 = settings_part[0].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
         let time_cost: u32 = settings_part[1].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
@@ -99,7 +106,13 @@ impl Hasher for Argon2Hasher {
             Err(_) => return Err(HasherError::InvalidArgon2Salt)
         };
 
-        Ok(hash == crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism))
+        // Argon2 has a flexible hash length:
+        let hash_length = match hash.from_base64() {
+            Ok(value) => value.len() as u32,
+            Err(_) => return Ok(false)
+        };
+
+        Ok(hash == crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism, version, hash_length))
     }
 
     fn encode(&self, password: &str, salt: &str, _: u32) -> String {
@@ -109,7 +122,9 @@ impl Hasher for Argon2Hasher {
         let memory_cost: u32 = 512;  // "kib" in Argon2's lingo.
         let time_cost: u32 = 2;  // "passes" in Argon2's lingo.
         let parallelism: u32 = 2;  // "lanes" in Argon2's lingo.
-        let hash = crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism);
+        let version: u32 = NEW_ARGON2_VERSION;
+        let hash_length: u32 = 16;
+        let hash = crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism, version, hash_length);
         format!("argon2$argon2i$v=19$m={},t={},p={}${}${}", memory_cost, time_cost, parallelism, salt, hash)
     }
 

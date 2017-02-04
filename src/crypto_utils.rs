@@ -84,17 +84,17 @@ pub fn hash_unix_crypt(password: &str, salt: &str) -> String {
     }
 }
 
-pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32, parallelism: u32) -> String {
+pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32, parallelism: u32, version: u32, hash_length: u32) -> String {
     let salt_bytes = salt.from_base64().unwrap();
     let argon2i_type: usize = 1;
     let empty_value = &[];
-    let mut result = [0u8; 16];
+    let mut result = vec![0u8; hash_length as usize];
     let mut context = cargon::CargonContext {
-        version: 0x13,
+        version: version,
         t_cost: time_cost,
         m_cost: memory_cost,
         lanes: parallelism,
-        out: result.as_mut_ptr(), outlen: result.len() as u32,
+        out: result.as_mut_ptr(), outlen: hash_length as u32,
         pwd: password.as_bytes().as_ptr(), pwdlen: password.as_bytes().len() as u32,
         salt: salt_bytes.as_ptr(), saltlen: salt_bytes.len() as u32,
         secret: empty_value.as_ptr(), secretlen: empty_value.len() as u32,
@@ -107,5 +107,5 @@ pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32,
     unsafe {
         cargon::argon2_ctx(&mut context, argon2i_type);
     }
-    result.to_base64(URL_SAFE)
+    result.to_base64(URL_SAFE).replace("-", "+")
 }
