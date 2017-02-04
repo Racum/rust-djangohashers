@@ -14,7 +14,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "0.2.6"
+djangohashers = "^0.2""
 ```
 
 Reference and import:
@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "0.2.6"
+version = "^0.2""
 features = ["fpbkdf2"]
 ```
 
