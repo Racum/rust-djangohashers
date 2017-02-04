@@ -56,8 +56,4 @@ fn test_argon2() {
     assert!(is_password_usable(&blank_encoded));
     assert!(check_password("", &blank_encoded).unwrap());
     assert!(!check_password(" ", &blank_encoded).unwrap());
-    // Old hashes without version attribute
-    let old_from_argon2_cffi = "argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg";
-    assert!(check_password("secret", old_from_argon2_cffi).unwrap());
-    assert!(!check_password("wrong", old_from_argon2_cffi).unwrap());
 }

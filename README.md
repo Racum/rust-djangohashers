@@ -43,7 +43,16 @@ version = "0.2.6"
 features = ["fpbkdf2"]
 ```
 
-You need to install OpenSSL and set the environment variable to make it visible to the compiler; this changes depending on the operation system and package manager, for example, in OS X with MacPorts you may need to do something like this:
+You need to install OpenSSL and set the environment variable to make it visible to the compiler; this changes depending on the operation system and package manager, for example, in macOS you may need to do something like this:
+
+Via [Homebrew](http://brew.sh):
+
+```
+$ brew install openssl
+$ CFLAGS="-I/usr/local/opt/openssl/include" cargo ...
+```
+
+Via [MacPorts](https://www.macports.org):
 
 ```
 $ sudo port install openssl
@@ -72,7 +81,7 @@ Notes:
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.9, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 1.11, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
