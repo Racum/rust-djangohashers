@@ -8,6 +8,31 @@ Django's `django.contrib.auth.models.User` class has a few methods to deal with 
 
 This library was conceived for Django integration, but is not limited to it; you can use the password hash algorithm in any Rust project (or FFI integration), since its security model is already battle-tested.
 
+## TL;DR
+
+Content of `examples/tldr.rs`:
+
+```rust
+extern crate djangohashers;
+use djangohashers::*;
+
+fn main() {
+    let encoded = make_password("K2jitmJ3CBfo");
+    println!("Hash: {:?}", encoded);
+    let is_valid = check_password("K2jitmJ3CBfo", &encoded).unwrap();
+    println!("Is valid: {:?}", is_valid);
+}
+```
+
+Output:
+
+```
+$ cargo run --quiet --example tldr
+Hash: "pbkdf2_sha256$30000$E2DtC4weM2DY$ZTso63dGXbq+QdVGUwq8Y05RgyUc3AsUSfswqUOZ3xc="
+Is valid: true
+```
+
+
 ## Installation
 
 Add the dependency to your `Cargo.toml`:
