@@ -144,8 +144,8 @@ fn iterations(version: &Version, algorithm: &Algorithm) -> u32 {
             &Version::V16 | &Version::V17 => 12000,
             &Version::V18 => 20000,
             &Version::V19 => 24000,
-            &Version::V110 | &Version::Current => 30000,
-            &Version::V111 => 36000,
+            &Version::V110 => 30000,
+            &Version::V111 | &Version::Current => 36000,
         },
         &Algorithm::Argon2 => 1,  // For Argon2, this means "Profile 1", not actually "1 integration".
         _ => 1,
