@@ -1,5 +1,6 @@
-extern crate rustc_serialize;
-use self::rustc_serialize::base64::FromBase64;
+extern crate base64;
+use self::base64::decode as base64_decode;
+
 use std::str;
 use crypto_utils;
 
@@ -101,13 +102,13 @@ impl Hasher for Argon2Hasher {
         let parallelism: u32 = settings_part[2].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
 
         // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
-        match salt.from_base64() {
+        match base64_decode(salt) {
             Ok(_) => {},
             Err(_) => return Err(HasherError::InvalidArgon2Salt)
         };
 
         // Argon2 has a flexible hash length:
-        let hash_length = match hash.from_base64() {
+        let hash_length = match base64_decode(hash) {
             Ok(value) => value.len() as u32,
             Err(_) => return Ok(false)
         };

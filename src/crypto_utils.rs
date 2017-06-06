@@ -1,6 +1,6 @@
 //! Set of cryptographic functions to simplify the Hashers.
 
-extern crate rustc_serialize;
+extern crate base64;
 extern crate crypto;
 extern crate bcrypt;
 extern crate pwhash;
@@ -10,7 +10,7 @@ extern crate cargon;
 extern crate fastpbkdf2;
 
 use std::ptr;
-use self::rustc_serialize::base64::{STANDARD, URL_SAFE, ToBase64, FromBase64};
+use self::base64::{encode_config, decode, STANDARD, URL_SAFE};
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use self::crypto::sha1::Sha1;
@@ -32,14 +32,14 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
     let mut mac = Hmac::new(Sha256::new(), &password.as_bytes());
     let mut result = [0u8; 32];
     pbkdf2(&mut mac, &salt.as_bytes(), iterations, &mut result);
-    result.to_base64(STANDARD)
+    encode_config(&result, STANDARD)
 }
 
 #[cfg(fpbkdf2)]
 pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
     let mut result = [0u8; 32];
     pbkdf2_hmac_sha256(&password.as_bytes(), &salt.as_bytes(), iterations, &mut result);
-    result.to_base64(STANDARD)
+    encode_config(&result, STANDARD)
 }
 
 #[cfg(not(fpbkdf2))]
@@ -47,14 +47,14 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
     let mut mac = Hmac::new(Sha1::new(), &password.as_bytes());
     let mut result = [0u8; 20];
     pbkdf2(&mut mac, &salt.as_bytes(), iterations, &mut result);
-    result.to_base64(STANDARD)
+    encode_config(&result, STANDARD)
 }
 
 #[cfg(fpbkdf2)]
 pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
     let mut result = [0u8; 20];
     pbkdf2_hmac_sha1(&password.as_bytes(), &salt.as_bytes(), iterations, &mut result);
-    result.to_base64(STANDARD)
+    encode_config(&result, STANDARD)
 }
 
 pub fn hash_sha1(password: &str, salt: &str) -> String {
@@ -85,7 +85,7 @@ pub fn hash_unix_crypt(password: &str, salt: &str) -> String {
 }
 
 pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32, parallelism: u32, version: u32, hash_length: u32) -> String {
-    let salt_bytes = salt.from_base64().unwrap();
+    let salt_bytes = decode(salt).unwrap();
     let argon2i_type: usize = 1;
     let empty_value = &[];
     let mut result = vec![0u8; hash_length as usize];
@@ -107,5 +107,5 @@ pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32,
     unsafe {
         cargon::argon2_ctx(&mut context, argon2i_type);
     }
-    result.to_base64(URL_SAFE).replace("-", "+")
+    encode_config(&result, URL_SAFE).replace("-", "+")
 }
