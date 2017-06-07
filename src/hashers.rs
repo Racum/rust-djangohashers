@@ -1,5 +1,6 @@
 extern crate base64;
-use self::base64::decode as base64_decode;
+use self::base64::{decode_config, URL_SAFE_NO_PAD};
+
 
 use std::str;
 use crypto_utils;
@@ -91,7 +92,8 @@ impl Hasher for Argon2Hasher {
         let segment_shift = 6 - encoded_part.len();
         let settings = encoded_part[3 - segment_shift];
         let salt = encoded_part[4 - segment_shift];
-        let hash = encoded_part[5 - segment_shift];
+        let string_hash = encoded_part[5 - segment_shift].replace("+", "-");
+        let hash = string_hash.as_str();
         let version = match segment_shift {
             0 => NEW_ARGON2_VERSION,
             _ => OLD_ARGON2_VERSION,
@@ -102,13 +104,13 @@ impl Hasher for Argon2Hasher {
         let parallelism: u32 = settings_part[2].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
 
         // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
-        match base64_decode(salt) {
+        match decode_config(salt, URL_SAFE_NO_PAD) {
             Ok(_) => {},
             Err(_) => return Err(HasherError::InvalidArgon2Salt)
         };
 
         // Argon2 has a flexible hash length:
-        let hash_length = match base64_decode(hash) {
+        let hash_length = match decode_config(hash, URL_SAFE_NO_PAD) {
             Ok(value) => value.len() as u32,
             Err(_) => return Ok(false)
         };

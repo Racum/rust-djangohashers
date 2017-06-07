@@ -10,7 +10,7 @@ extern crate cargon;
 extern crate fastpbkdf2;
 
 use std::ptr;
-use self::base64::{encode_config, decode, STANDARD, URL_SAFE};
+use self::base64::{encode_config, decode, STANDARD, URL_SAFE_NO_PAD};
 use self::crypto::digest::Digest;
 use self::crypto::sha2::Sha256;
 use self::crypto::sha1::Sha1;
@@ -107,5 +107,5 @@ pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32,
     unsafe {
         cargon::argon2_ctx(&mut context, argon2i_type);
     }
-    encode_config(&result, URL_SAFE).replace("-", "+")
+    encode_config(&result, URL_SAFE_NO_PAD)
 }
