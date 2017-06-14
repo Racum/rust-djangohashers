@@ -1,6 +1,6 @@
 [package]
 name = "djangohashers"
-version = "0.2.8"
+version = "0.2.9"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 documentation = "https://docs.rs/djangohashers/"
 license = "BSD-3-Clause"
@@ -24,7 +24,7 @@ fuzzy_tests = []
 [dependencies]
 rust-crypto = "^0.2"
 bcrypt = "^0.1"
-base64 = "^0.5"
+base64 = "^0.6"
 rand = "^0.3"
 pwhash = "^0.1"
 regex = "^0.2"
