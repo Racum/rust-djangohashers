@@ -1,6 +1,6 @@
 [package]
 name = "djangohashers"
-version = "0.2.9"
+version = "0.2.10"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 documentation = "https://docs.rs/djangohashers/"
 license = "BSD-3-Clause"
@@ -10,6 +10,9 @@ repository = "https://github.com/racum/rust-djangohashers"
 keywords = ["hash", "password", "python", "django", "crypto"]
 categories = ["algorithms", "authentication", "cryptography"]
 description = "A Rust port of the password primitives used in Django project."
+
+[badges]
+travis-ci = { repository = "Racum/rust-djangohashers" }
 
 [lib]
 doc = true

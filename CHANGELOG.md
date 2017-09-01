@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.10] - 2017-09-02
+
+### Added
+
+- Travis-CI badge.
+
 ## [0.2.9] - 2017-06-14
 
 ### Changed
