@@ -45,7 +45,7 @@ impl Hasher for PBKDF2Hasher {
                 return Err(HasherError::InvalidIterations);
             }
         }
-        Ok(hash == crypto_utils::hash_pbkdf2_sha256(password, salt, iterations))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_pbkdf2_sha256(password, salt, iterations)))
     }
 
     fn encode(&self, password: &str, salt: &str, iterations: u32) -> String {
@@ -71,7 +71,7 @@ impl Hasher for PBKDF2SHA1Hasher {
                 return Err(HasherError::InvalidIterations);
             }
         }
-        Ok(hash == crypto_utils::hash_pbkdf2_sha1(password, salt, iterations))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_pbkdf2_sha1(password, salt, iterations)))
     }
 
     fn encode(&self, password: &str, salt: &str, iterations: u32) -> String {
@@ -115,7 +115,7 @@ impl Hasher for Argon2Hasher {
             Err(_) => return Ok(false)
         };
 
-        Ok(hash == crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism, version, hash_length))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_argon2(password, salt, time_cost, memory_cost, parallelism, version, hash_length)))
     }
 
     fn encode(&self, password: &str, salt: &str, _: u32) -> String {
@@ -189,7 +189,7 @@ impl Hasher for SHA1Hasher {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
         let salt = encoded_part[1];
         let hash = encoded_part[2];
-        Ok(hash == crypto_utils::hash_sha1(password, salt))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_sha1(password, salt)))
     }
 
     fn encode(&self, password: &str, salt: &str, _: u32) -> String {
@@ -206,7 +206,7 @@ impl Hasher for MD5Hasher {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
         let salt = encoded_part[1];
         let hash = encoded_part[2];
-        Ok(hash == crypto_utils::hash_md5(password, salt))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_md5(password, salt)))
     }
 
     fn encode(&self, password: &str, salt: &str, _: u32) -> String {
@@ -222,7 +222,7 @@ impl Hasher for UnsaltedSHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
         let hash = encoded_part[2];
-        Ok(hash == crypto_utils::hash_sha1(password, ""))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_sha1(password, "")))
     }
 
     fn encode(&self, password: &str, _: &str, _: u32) -> String {
@@ -236,7 +236,7 @@ pub struct UnsaltedMD5Hasher;
 
 impl Hasher for UnsaltedMD5Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        Ok(encoded == crypto_utils::hash_md5(password, ""))
+        Ok(crypto_utils::safe_eq(encoded, crypto_utils::hash_md5(password, "")))
     }
 
     fn encode(&self, password: &str, _: &str, _: u32) -> String {
@@ -251,7 +251,7 @@ impl Hasher for CryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
         let hash = encoded_part[2];
-        Ok(hash == crypto_utils::hash_unix_crypt(password, hash))
+        Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_unix_crypt(password, hash)))
     }
 
     fn encode(&self, password: &str, salt: &str, _: u32) -> String {

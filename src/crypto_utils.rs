@@ -5,6 +5,7 @@ extern crate crypto;
 extern crate bcrypt;
 extern crate pwhash;
 extern crate cargon;
+extern crate constant_time_eq;
 
 #[cfg(fpbkdf2)]
 extern crate fastpbkdf2;
@@ -16,6 +17,7 @@ use self::crypto::sha2::Sha256;
 use self::crypto::sha1::Sha1;
 use self::crypto::md5::Md5;
 use self::pwhash::unix_crypt::hash_with;
+use self::constant_time_eq::constant_time_eq;
 
 #[cfg(not(fpbkdf2))]
 use self::crypto::hmac::Hmac;
@@ -26,6 +28,10 @@ use self::fastpbkdf2::{pbkdf2_hmac_sha1, pbkdf2_hmac_sha256};
 
 pub use self::bcrypt::hash as hash_bcrypt;
 pub use self::bcrypt::verify as verify_bcrypt;
+
+pub fn safe_eq(a: &str, b: String) -> bool {
+    constant_time_eq(a.as_bytes(), b.as_bytes())
+}
 
 #[cfg(not(fpbkdf2))]
 pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
