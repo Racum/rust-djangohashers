@@ -133,6 +133,8 @@ pub enum Version {
     V110,
     /// Django 1.11.
     V111,
+    /// Django 2.00.
+    V20,
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -145,7 +147,8 @@ fn iterations(version: &Version, algorithm: &Algorithm) -> u32 {
             &Version::V18 => 20000,
             &Version::V19 => 24000,
             &Version::V110 => 30000,
-            &Version::V111 | &Version::Current => 36000,
+            &Version::V111 => 36000,
+            &Version::V20 | &Version::Current => 100000,
         },
         &Algorithm::Argon2 => 1,  // For Argon2, this means "Profile 1", not actually "1 integration".
         _ => 1,

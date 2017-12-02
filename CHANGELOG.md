@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.12] - 2017-12-03
+
+### Changed
+
+- Set default Django version to 2.0
+- Updated dependencies.
+
 ## [0.2.11] - 2017-10-02
 
 ### Added
