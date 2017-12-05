@@ -8,8 +8,9 @@ use djangohashers::*;
 
 
 #[test]
+#[cfg(feature="with_pbkdf2")]
 fn test_pbkdf2() {
-    let django = Django {version: Version::V18};
+    let django = Django {version: DjangoVersion::V1_8};
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
     assert!(encoded ==
             "pbkdf2_sha256$20000$seasalt$oBSd886ysm3AqYun62DOdin8YcfbU1z9cksZSuLP9r0=".to_string());
@@ -25,8 +26,9 @@ fn test_pbkdf2() {
 }
 
 #[test]
+#[cfg(feature="with_pbkdf2")]
 fn test_low_level_pbkdf2() {
-    let django = Django {version: Version::V18};
+    let django = Django {version: DjangoVersion::V1_8};
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2);
     assert!(encoded ==
             "pbkdf2_sha256$20000$seasalt2$Flpve/uAcyo6+IFI6YAhjeABGPVbRQjzHDxRhqxewgw="
@@ -35,8 +37,9 @@ fn test_low_level_pbkdf2() {
 }
 
 #[test]
+#[cfg(feature="with_pbkdf2")]
 fn test_low_level_pbkdf2_sha1() {
-    let django = Django {version: Version::V18};
+    let django = Django {version: DjangoVersion::V1_8};
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2SHA1);
     assert!(encoded == "pbkdf2_sha1$20000$seasalt2$pJt86NmjAweBY1StBvxCu7l1o9o=".to_string());
     assert!(check_password("lètmein", &encoded).unwrap());

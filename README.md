@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^0.2"
+djangohashers = "^0.3"
 ```
 
 Reference and import:
@@ -54,6 +54,20 @@ use djangohashers::*;
 use djangohashers::{check_password, make_password, Algorithm};
 ```
 
+## Compiling Features
+
+> New in `0.3.0`.
+
+By default all the hashers are enabled, but you can pick only the hashers that you need to avoid unneeded dependencies.
+
+* `default`: all hashers.
+* `with_pbkdf2`: only **PBKDF2** and **PBKDF2SHA1**.
+* `with_argon2`: only **Argon2**.
+* `with_bcrypt`: only **BCrypt** and **BCryptSHA256**.
+* `with_legacy`: only **SHA1**, **MD5**, **UnsaltedSHA1**, **UnsaltedMD5** and **Crypt**.
+* `fpbkdf2`: enables **Fast PBKDF2** (requires OpenSSL, see below).
+* `fuzzy_tests`: only for development, enables fuzzy tests.
+
 ## Fast PBKDF2 Version
 
 Unfortunately rust-crypto’s implementation of PBKDF2 is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
@@ -64,7 +78,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^0.2"
+version = "^0.3"
 features = ["fpbkdf2"]
 ```
 
@@ -106,7 +120,7 @@ Notes:
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 1.11, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 2.0, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
@@ -224,9 +238,9 @@ let encoded = make_password_with_settings("KRONOS", "seasalt", Algorithm::PBKDF2
 Django versions can have different number of iterations for hashers based on PBKDF2 and BCrypt algorithms; this abstraction makes possible to generate a password with the same number of iterations used in that versions.
 
 ```rust
-use djangohashers::{Django, Version};
+use djangohashers::{Django, DjangoVersion};
 
-let django = Django {version: Version::V18};  // Django 1.8.
+let django = Django {version: DjangoVersion::V1_8};  // Django 1.8.
 let encoded = django.make_password("KRONOS");
 // Returns something like:
 // pbkdf2_sha256$20000$u0C1E8jrnAYx$7KIo/fAuBJpswQyL7pTxO06ccrSjGdIe7iSqzdVub1w=
@@ -236,16 +250,16 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `Version::Current` Current Django version (`2.0` for DjangoHashers `0.2.12`).
-* `Version::V14` Django 1.4
-* `Version::V15` Django 1.5
-* `Version::V16` Django 1.6
-* `Version::V17` Django 1.7
-* `Version::V18` Django 1.8
-* `Version::V19` Django 1.9
-* `Version::V110` Django 1.10
-* `Version::V111` Django 1.11
-* `Version::V20` Django 2.0
+* `DjangoVersion::Current` Current Django version (`2.0` for DjangoHashers `0.3.0`).
+* `DjangoVersion::V1_4` Django 1.4
+* `DjangoVersion::V1_5` Django 1.5
+* `DjangoVersion::V1_6` Django 1.6
+* `DjangoVersion::V1_7` Django 1.7
+* `DjangoVersion::V1_8` Django 1.8
+* `DjangoVersion::V1_9` Django 1.9
+* `DjangoVersion::V1_10` Django 1.10
+* `DjangoVersion::V1_11` Django 1.11
+* `DjangoVersion::V2_0` Django 2.0
 
 ### Verifying a Hash Format (pre-crypto)
 

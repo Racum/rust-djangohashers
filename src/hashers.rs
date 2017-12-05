@@ -1,4 +1,6 @@
+#[cfg(feature="with_argon2")]
 extern crate base64;
+#[cfg(feature="with_argon2")]
 use self::base64::{decode_config, URL_SAFE_NO_PAD};
 
 
@@ -29,8 +31,10 @@ pub trait Hasher {
 // List of Hashers:
 
 /// Hasher that uses the PBKDF2 key-derivation function with the SHA256 hashing algorithm.
+#[cfg(feature="with_pbkdf2")]
 pub struct PBKDF2Hasher;
 
+#[cfg(feature="with_pbkdf2")]
 impl Hasher for PBKDF2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
@@ -55,8 +59,10 @@ impl Hasher for PBKDF2Hasher {
 }
 
 /// Hasher that uses the PBKDF2 key-derivation function with the SHA1 hashing algorithm.
+#[cfg(feature="with_pbkdf2")]
 pub struct PBKDF2SHA1Hasher;
 
+#[cfg(feature="with_pbkdf2")]
 impl Hasher for PBKDF2SHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
@@ -81,11 +87,15 @@ impl Hasher for PBKDF2SHA1Hasher {
 }
 
 /// Hasher that uses the Argon2 function (new in Django 1.10).
+#[cfg(feature="with_argon2")]
 pub struct Argon2Hasher;
 
+#[cfg(feature="with_argon2")]
 const OLD_ARGON2_VERSION: u32 = 0x10;
+#[cfg(feature="with_argon2")]
 const NEW_ARGON2_VERSION: u32 = 0x13;
 
+#[cfg(feature="with_argon2")]
 impl Hasher for Argon2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
@@ -134,8 +144,10 @@ impl Hasher for Argon2Hasher {
 }
 
 /// Hasher that uses the bcrypt key-derivation function with the password padded with SHA256.
+#[cfg(feature="with_bcrypt")]
 pub struct BCryptSHA256Hasher;
 
+#[cfg(feature="with_bcrypt")]
 impl Hasher for BCryptSHA256Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
@@ -159,8 +171,10 @@ impl Hasher for BCryptSHA256Hasher {
 }
 
 /// Hasher that uses the bcrypt key-derivation function without password padding.
+#[cfg(feature="with_bcrypt")]
 pub struct BCryptHasher;
 
+#[cfg(feature="with_bcrypt")]
 impl Hasher for BCryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
@@ -182,8 +196,10 @@ impl Hasher for BCryptHasher {
 }
 
 /// Hasher that uses the SHA1 hashing function over the salted password.
+#[cfg(feature="with_legacy")]
 pub struct SHA1Hasher;
 
+#[cfg(feature="with_legacy")]
 impl Hasher for SHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
@@ -199,8 +215,10 @@ impl Hasher for SHA1Hasher {
 }
 
 /// Hasher that uses the MD5 hashing function over the salted password.
+#[cfg(feature="with_legacy")]
 pub struct MD5Hasher;
 
+#[cfg(feature="with_legacy")]
 impl Hasher for MD5Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
@@ -216,8 +234,10 @@ impl Hasher for MD5Hasher {
 }
 
 /// Hasher that uses the SHA1 hashing function with no salting.
+#[cfg(feature="with_legacy")]
 pub struct UnsaltedSHA1Hasher;
 
+#[cfg(feature="with_legacy")]
 impl Hasher for UnsaltedSHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
@@ -232,8 +252,10 @@ impl Hasher for UnsaltedSHA1Hasher {
 }
 
 /// Hasher that uses the MD5 hashing function with no salting.
+#[cfg(feature="with_legacy")]
 pub struct UnsaltedMD5Hasher;
 
+#[cfg(feature="with_legacy")]
 impl Hasher for UnsaltedMD5Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         Ok(crypto_utils::safe_eq(encoded, crypto_utils::hash_md5(password, "")))
@@ -245,8 +267,10 @@ impl Hasher for UnsaltedMD5Hasher {
 }
 
 /// Hasher that uses the UNIX's crypt(3) hash function.
+#[cfg(feature="with_legacy")]
 pub struct CryptHasher;
 
+#[cfg(feature="with_legacy")]
 impl Hasher for CryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();

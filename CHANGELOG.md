@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] - 2017-12-05
+
+### Added
+
+- New compiling features to select that hashers to include.
+
+### Changed
+
+- Renamed Django version enum and its items.
+
 ## [0.2.12] - 2017-12-03
 
 ### Changed
