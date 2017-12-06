@@ -6,13 +6,13 @@ script:
   - cargo test --verbose --no-fail-fast
   - cargo test --verbose --no-fail-fast --features fpbkdf2
   - cargo test --verbose --no-fail-fast --features "fpbkdf2 fuzzy_tests" --release
-  - cargo test --verbose --no-fail-fast --features "with_pbkdf2" --release
-  - cargo test --verbose --no-fail-fast --features "with_bcrypt" --release
-  - cargo test --verbose --no-fail-fast --features "with_argon2" --release
-  - cargo test --verbose --no-fail-fast --features "with_legacy" --release
-  - cargo test --verbose --no-fail-fast --features "with_legacy with_bcrypt" --release
-  - cargo test --verbose --no-fail-fast --features "with_legacy with_argon2" --release
-  - cargo test --verbose --no-fail-fast --features "with_legacy with_legacy" --release
-  - cargo test --verbose --no-fail-fast --features "with_bcrypt with_argon2" --release
-  - cargo test --verbose --no-fail-fast --features "with_bcrypt with_legacy" --release
-  - cargo test --verbose --no-fail-fast --features "with_argon2 with_legacy" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_pbkdf2" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_bcrypt" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_argon2" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_legacy" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_legacy with_bcrypt" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_legacy with_argon2" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_legacy with_legacy" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_bcrypt with_argon2" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_bcrypt with_legacy" --release
+  - cargo test --verbose --no-fail-fast --no-default-features --features "with_argon2 with_legacy" --release
