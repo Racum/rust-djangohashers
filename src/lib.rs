@@ -13,6 +13,7 @@ extern crate regex;
 #[macro_use] extern crate lazy_static;
 
 use rand::Rng;
+use rand::distributions::Alphanumeric;
 mod crypto_utils;
 mod hashers;
 use regex::Regex;
@@ -197,7 +198,7 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
 
 /// Generates a random salt.
 fn random_salt() -> String {
-    rand::thread_rng().gen_ascii_chars().take(12).collect::<String>()
+    rand::thread_rng().sample_iter(&Alphanumeric).take(12).collect()
 }
 
 lazy_static! {

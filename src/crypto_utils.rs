@@ -32,6 +32,7 @@ use self::crypto::sha1::Sha1;
 #[cfg(feature="with_legacy")]
 use self::crypto::md5::Md5;
 #[cfg(feature="with_legacy")]
+#[allow(deprecated)]
 use self::pwhash::unix_crypt::hash_with;
 #[cfg(any(feature="with_pbkdf2", feature="with_argon2", feature="with_legacy"))]
 use self::constant_time_eq::constant_time_eq;
@@ -111,6 +112,7 @@ pub fn hash_md5(password: &str, salt: &str) -> String {
 
 #[cfg(feature="with_legacy")]
 pub fn hash_unix_crypt(password: &str, salt: &str) -> String {
+    #[allow(deprecated)]
     match hash_with(salt, password) {
         Ok(value) => value,
         Err(_) => "".to_string()

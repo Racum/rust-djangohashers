@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2018-06-23
+
+### Changed
+
+- Removed deprecated `rand::Rng::gen_ascii_chars()`.
+- Silence deprecation warning on `pwhash::unix_crypt`.
+- Updated dependencies.
+
 ## [0.3.0] - 2017-12-05
 
 ### Added
