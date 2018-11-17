@@ -171,6 +171,10 @@ pub enum DjangoVersion {
     V1_11,
     /// Django 2.0.
     V2_0,
+    /// Django 2.1.
+    V2_1,
+    /// Django 2.2.
+    V2_2,
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -187,7 +191,9 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             &DjangoVersion::V1_9 => 24000,
             &DjangoVersion::V1_10 => 30000,
             &DjangoVersion::V1_11 => 36000,
-            &DjangoVersion::V2_0 | &DjangoVersion::Current => 100000,
+            &DjangoVersion::V2_0 => 100000,
+            &DjangoVersion::V2_1 | &DjangoVersion::Current => 120000,
+            &DjangoVersion::V2_2 => 150000,
         },
         #[cfg(feature="with_argon2")]
         &Algorithm::Argon2 => 1,  // For Argon2, this means "Profile 1", not actually "1 integration".

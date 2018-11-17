@@ -250,7 +250,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `DjangoVersion::Current` Current Django version (`2.0` for DjangoHashers `0.3.0`).
+* `DjangoVersion::Current` Current Django version (`2.1` for DjangoHashers `0.3.2`).
 * `DjangoVersion::V1_4` Django 1.4
 * `DjangoVersion::V1_5` Django 1.5
 * `DjangoVersion::V1_6` Django 1.6
@@ -260,6 +260,8 @@ Available versions:
 * `DjangoVersion::V1_10` Django 1.10
 * `DjangoVersion::V1_11` Django 1.11
 * `DjangoVersion::V2_0` Django 2.0
+* `DjangoVersion::V2_1` Django 2.1
+* `DjangoVersion::V2_2` Django 2.2
 
 ### Verifying a Hash Format (pre-crypto)
 
