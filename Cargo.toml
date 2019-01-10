@@ -22,21 +22,25 @@ bench = true
 
 [features]
 default = ["with_pbkdf2", "with_argon2", "with_bcrypt", "with_legacy"]
-with_pbkdf2 = ["base64", "constant_time_eq"]
+with_pbkdf2 = ["base64", "constant_time_eq", "pbkdf2", "sha-1", "sha2", "hmac"]
 with_argon2 = ["base64", "cargon", "constant_time_eq"]
-with_bcrypt = ["bcrypt"]
-with_legacy = ["pwhash", "constant_time_eq"]
-fpbkdf2 = ["with_pbkdf2", "fastpbkdf2"]
+with_bcrypt = ["bcrypt", "sha2"]
+with_legacy = ["pwhash", "constant_time_eq", "md-5", "sha-1"]
+fpbkdf2 = ["base64", "constant_time_eq", "fastpbkdf2"]
 fuzzy_tests = []
 
 [dependencies]
-rust-crypto = "^0.2"
 rand = "^0.6"
 regex = "^1.0"
 lazy_static = "^1.0"
+md-5 = { version = "0.8.0", optional = true }
+sha-1 = { version = "0.8.1", optional = true }
+sha2 = { version = "0.8.0", optional = true }
+pbkdf2 = { version = "0.3.0", optional = true }
+hmac = { version = "0.7.0", optional = true }
 bcrypt = { version = "^0.2", optional = true }
 base64 = { version = "^0.10", optional = true }
-pwhash = { version = "^0.2", optional = true }
+pwhash = { version = "^0.3", optional = true }
 fastpbkdf2 = { version = "0.1.0", optional = true }
 cargon = { version = "0.0.1", optional = true }
 constant_time_eq = { version = "0.1.3", optional = true }

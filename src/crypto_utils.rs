@@ -7,10 +7,8 @@ pub fn safe_eq(a: &str, b: String) -> bool {
 
 #[cfg(all(feature="with_pbkdf2", not(feature="fpbkdf2")))]
 pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
-    use crypto::{hmac::Hmac, sha2::Sha256, pbkdf2::pbkdf2};
-    let mut mac = Hmac::new(Sha256::new(), &password.as_bytes());
     let mut result = [0u8; 32];
-    pbkdf2(&mut mac, &salt.as_bytes(), iterations, &mut result);
+    pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha256>>(password.as_bytes(), salt.as_bytes(), iterations as usize, &mut result);
     base64::encode_config(&result, base64::STANDARD)
 }
 
@@ -25,10 +23,8 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
 #[cfg(feature="with_pbkdf2")]
 #[cfg(not(feature="fpbkdf2"))]
 pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
-    use crypto::{hmac::Hmac, sha1::Sha1, pbkdf2::pbkdf2};
-    let mut mac = Hmac::new(Sha1::new(), &password.as_bytes());
     let mut result = [0u8; 20];
-    pbkdf2(&mut mac, &salt.as_bytes(), iterations, &mut result);
+    pbkdf2::pbkdf2::<hmac::Hmac<sha1::Sha1>>(password.as_bytes(), salt.as_bytes(), iterations as usize, &mut result);
     base64::encode_config(&result, base64::STANDARD)
 }
 
@@ -42,28 +38,28 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
 
 #[cfg(feature="with_legacy")]
 pub fn hash_sha1(password: &str, salt: &str) -> String {
-    use crypto::{sha1::Sha1, digest::Digest};
-    let mut sha = Sha1::new();
-    sha.input_str(salt);
-    sha.input_str(password);
-    sha.result_str()
+    use sha1::{Sha1, Digest};
+    let digest = Sha1::new()
+        .chain(salt.as_bytes())
+        .chain(password.as_bytes())
+        .result();
+    format!("{:x}", digest)
 }
 
 #[cfg(feature="with_bcrypt")]
 pub fn hash_sha256(password: &str) -> String {
-    use crypto::{sha2::Sha256, digest::Digest};
-    let mut sha = Sha256::new();
-    sha.input_str(password);
-    sha.result_str()
+    use sha2::{Sha256, Digest};
+    format!("{:x}", Sha256::digest(password.as_bytes()))
 }
 
 #[cfg(feature="with_legacy")]
 pub fn hash_md5(password: &str, salt: &str) -> String {
-    use crypto::{md5::Md5, digest::Digest};
-    let mut md5 = Md5::new();
-    md5.input_str(salt);
-    md5.input_str(password);
-    md5.result_str()
+    use md5::{Md5, Digest};
+    let digest = Md5::new()
+        .chain(salt)
+        .chain(password)
+        .result();
+    format!("{:x}", digest)
 }
 
 #[cfg(feature="with_legacy")]
