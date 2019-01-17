@@ -18,7 +18,7 @@ fn test_pbkdf2_sha256() {
 #[cfg(feature="with_pbkdf2")]
 fn test_pbkdf2_sha256_bad_hash() {
     assert!(is_password_usable("pbkdf2_sha256$"));
-    assert!(!check_password(PASSWORD, "pbkdf2_sha256$").unwrap());
+    assert_eq!(check_password(PASSWORD, "pbkdf2_sha256$"), Err(HasherError::InvalidIterations));
 }
 
 #[test]
@@ -34,7 +34,7 @@ fn test_pbkdf2_sha1() {
 #[cfg(feature="with_pbkdf2")]
 fn test_pbkdf2_sha1_bad_hash() {
     assert!(is_password_usable("pbkdf2_sha1$"));
-    assert!(!check_password(PASSWORD, "pbkdf2_sha1$").unwrap());
+    assert_eq!(check_password(PASSWORD, "pbkdf2_sha1$"), Err(HasherError::InvalidIterations));
 }
 
 #[test]
@@ -50,7 +50,7 @@ fn test_sha1() {
 #[cfg(feature="with_legacy")]
 fn test_sha1_bad_hash() {
     assert!(is_password_usable("sha1$"));
-    assert!(!check_password(PASSWORD, "sha1$").unwrap());
+    assert_eq!(check_password(PASSWORD, "sha1$"), Err(HasherError::BadHash));
 }
 
 #[test]
@@ -66,7 +66,7 @@ fn test_md5() {
 #[cfg(feature="with_legacy")]
 fn test_md5_bad_hash() {
     assert!(is_password_usable("md5$"));
-    assert!(!check_password(PASSWORD, "md5$").unwrap());
+    assert_eq!(check_password(PASSWORD, "md5$"), Err(HasherError::BadHash));
 }
 
 #[test]
@@ -118,7 +118,7 @@ fn test_crypt() {
 #[cfg(feature="with_legacy")]
 fn test_crypt_bad_hash() {
     assert!(is_password_usable("crypt$"));
-    assert!(!check_password(PASSWORD, "crypt$").unwrap());
+    assert_eq!(check_password(PASSWORD, "crypt$"), Err(HasherError::BadHash));
 }
 
 #[test]
@@ -148,7 +148,7 @@ fn test_argon2_old() {
 #[cfg(feature="with_argon2")]
 fn test_argon2_bad_hash() {
     assert!(is_password_usable("argon2$"));
-    assert!(!check_password(PASSWORD, "argon2$").unwrap());
+    assert_eq!(check_password(PASSWORD, "argon2$"), Err(HasherError::BadHash));
 }
 
 #[test]

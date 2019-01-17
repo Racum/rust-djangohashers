@@ -12,6 +12,8 @@ use crypto_utils;
 pub enum HasherError {
     /// Algorithm not recognizable.
     UnknownAlgorithm,
+    /// Hash string is corrupted.
+    BadHash,
     /// Hash string is empty.
     EmptyHash,
     /// Number of iterations is not a positive integer.
@@ -37,18 +39,11 @@ pub struct PBKDF2Hasher;
 #[cfg(feature="with_pbkdf2")]
 impl Hasher for PBKDF2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let salt = encoded_part[2];
-        let hash = encoded_part[3];
-        let iterations: u32;
-        match encoded_part[1].parse::<u32>() {
-            Ok(n) => {
-                iterations = n;
-            }
-            Err(_) => {
-                return Err(HasherError::InvalidIterations);
-            }
-        }
+        let mut encoded_part = encoded.split("$").skip(1);
+        let iterations = encoded_part.next().ok_or(HasherError::BadHash)?
+            .parse::<u32>().map_err(|_| HasherError::InvalidIterations)?;
+        let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
+        let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_pbkdf2_sha256(password, salt, iterations)))
     }
 
@@ -65,18 +60,11 @@ pub struct PBKDF2SHA1Hasher;
 #[cfg(feature="with_pbkdf2")]
 impl Hasher for PBKDF2SHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let salt = encoded_part[2];
-        let hash = encoded_part[3];
-        let iterations: u32;
-        match encoded_part[1].parse::<u32>() {
-            Ok(n) => {
-                iterations = n;
-            }
-            Err(_) => {
-                return Err(HasherError::InvalidIterations);
-            }
-        }
+        let mut encoded_part = encoded.split("$").skip(1);
+        let iterations = encoded_part.next().ok_or(HasherError::BadHash)?
+            .parse::<u32>().map_err(|_| HasherError::InvalidIterations)?;
+        let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
+        let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_pbkdf2_sha1(password, salt, iterations)))
     }
 
@@ -99,15 +87,16 @@ const NEW_ARGON2_VERSION: u32 = 0x13;
 impl Hasher for Argon2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split("$").collect();
+        let version = match encoded_part.len() {
+            6 => NEW_ARGON2_VERSION,
+            5 => OLD_ARGON2_VERSION,
+            _ => return Err(HasherError::BadHash),
+        };
         let segment_shift = 6 - encoded_part.len();
         let settings = encoded_part[3 - segment_shift];
         let salt = encoded_part[4 - segment_shift];
         let string_hash = encoded_part[5 - segment_shift].replace("+", "-");
         let hash = string_hash.as_str();
-        let version = match segment_shift {
-            0 => NEW_ARGON2_VERSION,
-            _ => OLD_ARGON2_VERSION,
-        };
         let settings_part: Vec<&str> = settings.split(",").collect();
         let memory_cost: u32 = settings_part[0].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
         let time_cost: u32 = settings_part[1].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
@@ -202,9 +191,9 @@ pub struct SHA1Hasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for SHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let salt = encoded_part[1];
-        let hash = encoded_part[2];
+        let mut encoded_part = encoded.split("$").skip(1);
+        let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
+        let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_sha1(password, salt)))
     }
 
@@ -221,9 +210,9 @@ pub struct MD5Hasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for MD5Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let salt = encoded_part[1];
-        let hash = encoded_part[2];
+        let mut encoded_part = encoded.split("$").skip(1);
+        let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
+        let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_md5(password, salt)))
     }
 
@@ -240,8 +229,8 @@ pub struct UnsaltedSHA1Hasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for UnsaltedSHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let hash = encoded_part[2];
+        let mut encoded_part = encoded.split("$").skip(2);
+        let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_sha1(password, "")))
     }
 
@@ -273,8 +262,8 @@ pub struct CryptHasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for CryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
-        let hash = encoded_part[2];
+        let mut encoded_part = encoded.split("$").skip(2);
+        let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_unix_crypt(password, hash)))
     }
 
