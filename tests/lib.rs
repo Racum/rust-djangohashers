@@ -1,5 +1,3 @@
-extern crate djangohashers;
-
 use djangohashers::*;
 
 static PASSWORD: &'static str = "ExjGmyUT73bFoT";

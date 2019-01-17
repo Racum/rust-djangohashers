@@ -1,11 +1,5 @@
-#[cfg(feature="with_argon2")]
-extern crate base64;
-#[cfg(feature="with_argon2")]
-use self::base64::{decode_config, URL_SAFE_NO_PAD};
-
-
 use std::str;
-use crypto_utils;
+use crate::crypto_utils;
 
 /// Possible errors during a hash creation.
 #[derive(PartialEq, Debug)]
@@ -114,13 +108,13 @@ impl Hasher for Argon2Hasher {
         let parallelism: u32 = settings_part[2].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
 
         // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
-        match decode_config(salt, URL_SAFE_NO_PAD) {
+        match base64::decode_config(salt, base64::URL_SAFE_NO_PAD) {
             Ok(_) => {},
             Err(_) => return Err(HasherError::InvalidArgon2Salt)
         };
 
         // Argon2 has a flexible hash length:
-        let hash_length = match decode_config(hash, URL_SAFE_NO_PAD) {
+        let hash_length = match base64::decode_config(hash, base64::URL_SAFE_NO_PAD) {
             Ok(value) => value.len() as u32,
             Err(_) => return Ok(false)
         };
@@ -153,7 +147,7 @@ impl Hasher for BCryptSHA256Hasher {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
         let hash = bcrypt_encoded_part[1];
         let hashed_password = crypto_utils::hash_sha256(password);
-        match crypto_utils::verify_bcrypt(&hashed_password, hash) {
+        match bcrypt::verify(&hashed_password, hash) {
             Ok(valid) => {
                 return Ok(valid);
             }
@@ -165,7 +159,7 @@ impl Hasher for BCryptSHA256Hasher {
 
     fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
         let hashed_password = crypto_utils::hash_sha256(password);
-        let hash = crypto_utils::hash_bcrypt(&hashed_password, iterations).unwrap();
+        let hash = bcrypt::hash(&hashed_password, iterations).unwrap();
         format!("{}${}", "bcrypt_sha256", hash)
     }
 }
@@ -179,7 +173,7 @@ impl Hasher for BCryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
         let hash = bcrypt_encoded_part[1];
-        match crypto_utils::verify_bcrypt(password, hash) {
+        match bcrypt::verify(password, hash) {
             Ok(valid) => {
                 return Ok(valid);
             }
@@ -190,7 +184,7 @@ impl Hasher for BCryptHasher {
     }
 
     fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
-        let hash = crypto_utils::hash_bcrypt(password, iterations).unwrap();
+        let hash = bcrypt::hash(password, iterations).unwrap();
         format!("{}${}", "bcrypt", hash)
     }
 }

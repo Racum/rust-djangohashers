@@ -2,8 +2,6 @@
 //! https://github.com/django/django/blob/b170c07/django/contrib/auth/tests/hashers.py
 //! ...but only for the tests where the iterations differ from Django 1.9.
 
-extern crate djangohashers;
-
 use djangohashers::*;
 
 

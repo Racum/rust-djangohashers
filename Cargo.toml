@@ -10,6 +10,7 @@ repository = "https://github.com/racum/rust-djangohashers"
 keywords = ["hash", "password", "python", "django", "crypto"]
 categories = ["algorithms", "authentication", "cryptography"]
 description = "A Rust port of the password primitives used in Django project."
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "Racum/rust-djangohashers" }

@@ -8,17 +8,14 @@
 //! the password hash algorithm in any Rust project (or FFI integration), since its security
 //! model is already battle-tested.
 
-extern crate rand;
-extern crate regex;
-#[macro_use] extern crate lazy_static;
-
+use lazy_static::lazy_static;
 use rand::Rng;
 use rand::distributions::Alphanumeric;
 mod crypto_utils;
 mod hashers;
 use regex::Regex;
 
-pub use hashers::*;
+pub use crate::hashers::*;
 
 /// Algorithms available to use with Hashers.
 #[derive(PartialEq)]

@@ -1,11 +1,7 @@
 #[cfg(feature="fuzzy_tests")]
-#[macro_use] extern crate quickcheck;
-extern crate djangohashers;
-
-#[cfg(feature="fuzzy_tests")]
 mod fuzzy_tests {
     use djangohashers::*;
-    use quickcheck::TestResult;
+    use quickcheck::{quickcheck, TestResult};
 
     #[cfg(feature="with_argon2")]
     extern crate base64;

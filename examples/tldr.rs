@@ -1,4 +1,3 @@
-extern crate djangohashers;
 use djangohashers::*;
 
 fn main() {

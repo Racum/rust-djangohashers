@@ -2,8 +2,6 @@
 //! https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py
 //! ...except for some cases that don't make sense in Rust, or in the scope of this library.
 
-extern crate djangohashers;
-
 use djangohashers::*;
 
 #[test]

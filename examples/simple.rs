@@ -1,4 +1,3 @@
-extern crate djangohashers;
 use djangohashers::{check_password, make_password};
 
 fn main() {
