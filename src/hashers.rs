@@ -12,9 +12,9 @@ use crypto_utils;
 pub enum HasherError {
     /// Algorithm not recognizable.
     UnknownAlgorithm,
-    /// Number of iterations is not a positive integer.
-    EmptyHash,
     /// Hash string is empty.
+    EmptyHash,
+    /// Number of iterations is not a positive integer.
     InvalidIterations,
     /// Argon2 salt should be Base64 encoded.
     InvalidArgon2Salt,
