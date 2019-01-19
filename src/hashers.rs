@@ -33,7 +33,7 @@ pub struct PBKDF2Hasher;
 #[cfg(feature="with_pbkdf2")]
 impl Hasher for PBKDF2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let mut encoded_part = encoded.split("$").skip(1);
+        let mut encoded_part = encoded.split('$').skip(1);
         let iterations = encoded_part.next().ok_or(HasherError::BadHash)?
             .parse::<u32>().map_err(|_| HasherError::InvalidIterations)?;
         let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
@@ -54,7 +54,7 @@ pub struct PBKDF2SHA1Hasher;
 #[cfg(feature="with_pbkdf2")]
 impl Hasher for PBKDF2SHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let mut encoded_part = encoded.split("$").skip(1);
+        let mut encoded_part = encoded.split('$').skip(1);
         let iterations = encoded_part.next().ok_or(HasherError::BadHash)?
             .parse::<u32>().map_err(|_| HasherError::InvalidIterations)?;
         let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
@@ -80,7 +80,7 @@ const NEW_ARGON2_VERSION: u32 = 0x13;
 #[cfg(feature="with_argon2")]
 impl Hasher for Argon2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let encoded_part: Vec<&str> = encoded.split("$").collect();
+        let encoded_part: Vec<&str> = encoded.split('$').collect();
         let version = match encoded_part.len() {
             6 => NEW_ARGON2_VERSION,
             5 => OLD_ARGON2_VERSION,
@@ -89,12 +89,12 @@ impl Hasher for Argon2Hasher {
         let segment_shift = 6 - encoded_part.len();
         let settings = encoded_part[3 - segment_shift];
         let salt = encoded_part[4 - segment_shift];
-        let string_hash = encoded_part[5 - segment_shift].replace("+", "-");
+        let string_hash = encoded_part[5 - segment_shift].replace('+', "-");
         let hash = string_hash.as_str();
-        let settings_part: Vec<&str> = settings.split(",").collect();
-        let memory_cost: u32 = settings_part[0].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
-        let time_cost: u32 = settings_part[1].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
-        let parallelism: u32 = settings_part[2].split("=").collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
+        let settings_part: Vec<&str> = settings.split(',').collect();
+        let memory_cost: u32 = settings_part[0].split('=').collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
+        let time_cost: u32 = settings_part[1].split('=').collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
+        let parallelism: u32 = settings_part[2].split('=').collect::<Vec<&str>>()[1].parse::<u32>().unwrap();
 
         // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
         match base64::decode_config(salt, base64::URL_SAFE_NO_PAD) {
@@ -133,16 +133,12 @@ pub struct BCryptSHA256Hasher;
 #[cfg(feature="with_bcrypt")]
 impl Hasher for BCryptSHA256Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
+        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
         let hash = bcrypt_encoded_part[1];
         let hashed_password = crypto_utils::hash_sha256(password);
         match bcrypt::verify(&hashed_password, hash) {
-            Ok(valid) => {
-                return Ok(valid);
-            }
-            Err(_) => {
-                return Ok(false);
-            }
+            Ok(valid) => Ok(valid),
+            Err(_) => Ok(false)
         }
     }
 
@@ -160,15 +156,11 @@ pub struct BCryptHasher;
 #[cfg(feature="with_bcrypt")]
 impl Hasher for BCryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
+        let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
         let hash = bcrypt_encoded_part[1];
         match bcrypt::verify(password, hash) {
-            Ok(valid) => {
-                return Ok(valid);
-            }
-            Err(_) => {
-                return Ok(false);
-            }
+            Ok(valid) => Ok(valid),
+            Err(_) => Ok(false)
         }
     }
 
@@ -185,7 +177,7 @@ pub struct SHA1Hasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for SHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let mut encoded_part = encoded.split("$").skip(1);
+        let mut encoded_part = encoded.split('$').skip(1);
         let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
         let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_sha1(password, salt)))
@@ -204,7 +196,7 @@ pub struct MD5Hasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for MD5Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let mut encoded_part = encoded.split("$").skip(1);
+        let mut encoded_part = encoded.split('$').skip(1);
         let salt = encoded_part.next().ok_or(HasherError::BadHash)?;
         let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_md5(password, salt)))
@@ -223,7 +215,7 @@ pub struct UnsaltedSHA1Hasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for UnsaltedSHA1Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let mut encoded_part = encoded.split("$").skip(2);
+        let mut encoded_part = encoded.split('$').skip(2);
         let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_sha1(password, "")))
     }
@@ -256,7 +248,7 @@ pub struct CryptHasher;
 #[cfg(feature="with_legacy")]
 impl Hasher for CryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
-        let mut encoded_part = encoded.split("$").skip(2);
+        let mut encoded_part = encoded.split('$').skip(2);
         let hash = encoded_part.next().ok_or(HasherError::BadHash)?;
         Ok(crypto_utils::safe_eq(hash, crypto_utils::hash_unix_crypt(password, hash)))
     }

@@ -57,7 +57,7 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
 
     #[cfg(feature="with_legacy")]
     {
-        if encoded.len() == 32 && !encoded.contains("$") {
+        if encoded.len() == 32 && !encoded.contains('$') {
             return Some(Algorithm::UnsaltedMD5)
         }
         if encoded.len() == 46 && encoded.starts_with("sha1$$") {
@@ -65,7 +65,7 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
         }
     }
 
-    let encoded_part: Vec<&str> = encoded.splitn(2, "$").collect();
+    let encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
     match encoded_part[0] {
         #[cfg(feature="with_pbkdf2")]
         "pbkdf2_sha256" => Some(Algorithm::PBKDF2),
@@ -89,35 +89,34 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
 
 // Returns an instance of a Hasher based on the algorithm provided.
 fn get_hasher(algorithm: &Algorithm) -> Box<Hasher + 'static> {
-    match algorithm {
+    match *algorithm {
         #[cfg(feature="with_pbkdf2")]
-        &Algorithm::PBKDF2 => Box::new(PBKDF2Hasher),
+        Algorithm::PBKDF2 => Box::new(PBKDF2Hasher),
         #[cfg(feature="with_pbkdf2")]
-        &Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
+        Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
         #[cfg(feature="with_argon2")]
-        &Algorithm::Argon2 => Box::new(Argon2Hasher),
+        Algorithm::Argon2 => Box::new(Argon2Hasher),
         #[cfg(feature="with_bcrypt")]
-        &Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
+        Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
         #[cfg(feature="with_bcrypt")]
-        &Algorithm::BCrypt => Box::new(BCryptHasher),
+        Algorithm::BCrypt => Box::new(BCryptHasher),
         #[cfg(feature="with_legacy")]
-        &Algorithm::SHA1 => Box::new(SHA1Hasher),
+        Algorithm::SHA1 => Box::new(SHA1Hasher),
         #[cfg(feature="with_legacy")]
-        &Algorithm::MD5 => Box::new(MD5Hasher),
+        Algorithm::MD5 => Box::new(MD5Hasher),
         #[cfg(feature="with_legacy")]
-        &Algorithm::UnsaltedSHA1 => Box::new(UnsaltedSHA1Hasher),
+        Algorithm::UnsaltedSHA1 => Box::new(UnsaltedSHA1Hasher),
         #[cfg(feature="with_legacy")]
-        &Algorithm::UnsaltedMD5 => Box::new(UnsaltedMD5Hasher),
+        Algorithm::UnsaltedMD5 => Box::new(UnsaltedMD5Hasher),
         #[cfg(feature="with_legacy")]
-        &Algorithm::Crypt => Box::new(CryptHasher),
-        // _ => panic!("You need to compile with at least one algorithm.")
+        Algorithm::Crypt => Box::new(CryptHasher),
     }
 }
 
 /// Verifies if an encoded hash is properly formatted before check it cryptographically.
 pub fn is_password_usable(encoded: &str) -> bool {
     match identify_hasher(encoded) {
-        Some(_) => !(encoded == "" || encoded.starts_with("!")),
+        Some(_) => !(encoded == "" || encoded.starts_with('!')),
         None => false,
     }
 }
@@ -177,25 +176,25 @@ pub enum DjangoVersion {
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
 #[allow(unused_variables)]
 fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
-    match algorithm {
+    match *algorithm {
         #[cfg(feature="with_bcrypt")]
-        &Algorithm::BCryptSHA256 | &Algorithm::BCrypt => 12,
+        Algorithm::BCryptSHA256 | Algorithm::BCrypt => 12,
         #[cfg(feature="with_pbkdf2")]
-        &Algorithm::PBKDF2 | &Algorithm::PBKDF2SHA1 => match version {
-            &DjangoVersion::V1_4 | &DjangoVersion::V1_5 => 10000,
-            &DjangoVersion::V1_6 | &DjangoVersion::V1_7 => 12000,
-            &DjangoVersion::V1_8 => 20000,
-            &DjangoVersion::V1_9 => 24000,
-            &DjangoVersion::V1_10 => 30000,
-            &DjangoVersion::V1_11 => 36000,
-            &DjangoVersion::V2_0 => 100000,
-            &DjangoVersion::V2_1 | &DjangoVersion::Current => 120000,
-            &DjangoVersion::V2_2 => 150000,
+        Algorithm::PBKDF2 | Algorithm::PBKDF2SHA1 => match *version {
+            DjangoVersion::V1_4 | DjangoVersion::V1_5 => 10_000,
+            DjangoVersion::V1_6 | DjangoVersion::V1_7 => 12_000,
+            DjangoVersion::V1_8 => 20_000,
+            DjangoVersion::V1_9 => 24_000,
+            DjangoVersion::V1_10 => 30_000,
+            DjangoVersion::V1_11 => 36_000,
+            DjangoVersion::V2_0 => 100_000,
+            DjangoVersion::V2_1 | DjangoVersion::Current => 120_000,
+            DjangoVersion::V2_2 => 150_000,
         },
         #[cfg(feature="with_argon2")]
-        &Algorithm::Argon2 => 1,  // For Argon2, this means "Profile 1", not actually "1 integration".
+        Algorithm::Argon2 => 1,  // For Argon2, this means "Profile 1", not actually "1 integration".
         #[cfg(feature="with_legacy")]
-        &Algorithm::SHA1 | &Algorithm::MD5 | &Algorithm::UnsaltedSHA1 | &Algorithm::UnsaltedMD5 | &Algorithm::Crypt => 1,
+        Algorithm::SHA1 | Algorithm::MD5 | Algorithm::UnsaltedSHA1 | Algorithm::UnsaltedMD5 | Algorithm::Crypt => 1,
     }
 }
 

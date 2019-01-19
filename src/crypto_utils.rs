@@ -78,7 +78,7 @@ pub fn hash_argon2(password: &str, salt: &str, time_cost: u32, memory_cost: u32,
     let empty_value = &[];
     let mut result = vec![0u8; hash_length as usize];
     let mut context = cargon::CargonContext {
-        version: version,
+        version,
         t_cost: time_cost,
         m_cost: memory_cost,
         lanes: parallelism,
