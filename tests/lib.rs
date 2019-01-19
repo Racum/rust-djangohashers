@@ -14,11 +14,25 @@ fn test_pbkdf2_sha256() {
 
 #[test]
 #[cfg(feature="with_pbkdf2")]
+fn test_pbkdf2_sha256_bad_hash() {
+    assert!(is_password_usable("pbkdf2_sha256$"));
+    assert_eq!(check_password(PASSWORD, "pbkdf2_sha256$"), Err(HasherError::InvalidIterations));
+}
+
+#[test]
+#[cfg(feature="with_pbkdf2")]
 fn test_pbkdf2_sha1() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::PBKDF2SHA1, DjangoVersion::V1_9);
     let h = "pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU=";
     assert!(encoded == h.to_string());
     assert!(check_password(PASSWORD, &encoded).unwrap());
+}
+
+#[test]
+#[cfg(feature="with_pbkdf2")]
+fn test_pbkdf2_sha1_bad_hash() {
+    assert!(is_password_usable("pbkdf2_sha1$"));
+    assert_eq!(check_password(PASSWORD, "pbkdf2_sha1$"), Err(HasherError::InvalidIterations));
 }
 
 #[test]
@@ -32,11 +46,25 @@ fn test_sha1() {
 
 #[test]
 #[cfg(feature="with_legacy")]
+fn test_sha1_bad_hash() {
+    assert!(is_password_usable("sha1$"));
+    assert_eq!(check_password(PASSWORD, "sha1$"), Err(HasherError::BadHash));
+}
+
+#[test]
+#[cfg(feature="with_legacy")]
 fn test_md5() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::MD5, DjangoVersion::V1_9);
     let h = "md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e";
     assert!(encoded == h.to_string());
     assert!(check_password(PASSWORD, &encoded).unwrap());
+}
+
+#[test]
+#[cfg(feature="with_legacy")]
+fn test_md5_bad_hash() {
+    assert!(is_password_usable("md5$"));
+    assert_eq!(check_password(PASSWORD, "md5$"), Err(HasherError::BadHash));
 }
 
 #[test]
@@ -85,6 +113,13 @@ fn test_crypt() {
 }
 
 #[test]
+#[cfg(feature="with_legacy")]
+fn test_crypt_bad_hash() {
+    assert!(is_password_usable("crypt$"));
+    assert_eq!(check_password(PASSWORD, "crypt$"), Err(HasherError::BadHash));
+}
+
+#[test]
 #[cfg(feature="with_argon2")]
 fn test_argon2() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::Argon2, DjangoVersion::V1_10);
@@ -105,6 +140,13 @@ fn test_argon2_old() {
     let old_from_argon2_cffi = "argon2$argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY";
     assert!(check_password("password", old_from_argon2_cffi).unwrap());
     assert!(!check_password("wrong", old_from_argon2_cffi).unwrap());
+}
+
+#[test]
+#[cfg(feature="with_argon2")]
+fn test_argon2_bad_hash() {
+    assert!(is_password_usable("argon2$"));
+    assert_eq!(check_password(PASSWORD, "argon2$"), Err(HasherError::BadHash));
 }
 
 #[test]
