@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^0.3"
+djangohashers = "^1.0"
 ```
 
 Reference and import:
@@ -78,7 +78,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^0.3"
+version = "^1.0"
 features = ["fpbkdf2"]
 ```
 
@@ -120,7 +120,7 @@ Notes:
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 2.0, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 2.2, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
@@ -164,6 +164,7 @@ match check_password(password, encoded) {
 Possible Errors:
 
 * `HasherError::UnknownAlgorithm`: anything not recognizable as an algorithm.
+* `HasherError::BadHash`: Hash string is corrupted.
 * `HasherError::InvalidIterations`: number of iterations is not a positive integer.
 * `HasherError::EmptyHash`: hash string is empty.
 * `HasherError::InvalidArgon2Salt`: Argon2 salt should be Base64 encoded.

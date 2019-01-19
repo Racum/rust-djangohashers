@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2019-01-19
+
+### Changed
+
+- Update to Rust 2018 edition (thank's @andy128k).
+- Switch to RustCrypto implementations (thank's @andy128k).
+- Added error case for HasherError::BadHash (thank's @andy128k).
+- Updated dependencies.
+
 ## [0.3.2] - 2018-11-17
 
 ### Added
