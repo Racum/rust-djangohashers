@@ -47,7 +47,7 @@ mod fuzzy_tests {
     #[cfg(feature="with_bcrypt")]
     quickcheck! {
         fn test_fuzzy_bcrypt(pwd: String, salt: String) -> TestResult {
-            if pwd.len() >= 72 {
+            if pwd.contains('\0') || pwd.len() >= 72 {
                 return TestResult::discard();
             }
 
