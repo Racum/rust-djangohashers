@@ -153,19 +153,24 @@ impl Hasher for BCryptSHA256Hasher {
 #[cfg(feature="with_bcrypt")]
 pub struct BCryptHasher;
 
+/// Clears null-character from the password (BCrypt can't handle it).
+fn clear_nulls(password: &str) -> String {
+    password.replace("\u{0}", "").to_string()
+}
+
 #[cfg(feature="with_bcrypt")]
 impl Hasher for BCryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
         let hash = bcrypt_encoded_part[1];
-        match bcrypt::verify(password, hash) {
+        match bcrypt::verify(&clear_nulls(password), hash) {
             Ok(valid) => Ok(valid),
             Err(_) => Ok(false)
         }
     }
 
     fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
-        let hash = bcrypt::hash(password, iterations).unwrap();
+        let hash = bcrypt::hash(&clear_nulls(password), iterations).unwrap();
         format!("{}${}", "bcrypt", hash)
     }
 }
