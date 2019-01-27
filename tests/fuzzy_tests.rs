@@ -90,10 +90,4 @@ mod fuzzy_tests {
         }
     }
 
-    #[test]
-    #[cfg(feature="with_bcrypt")]
-    fn test_regression_bcrypt_with_null_character() {
-       let encoded = make_password_with_settings("\u{0}", "salt", Algorithm::BCrypt);
-       assert!(check_password_tolerant("\u{0}", &encoded));
-    }
 }

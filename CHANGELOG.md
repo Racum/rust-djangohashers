@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Fixed edge-case with null-character password using BCrypt.
+- Ignored null-character password fuzzing for BCrypt (thank's @andy128k).
 
 ## [1.0.0] - 2019-01-19
 
