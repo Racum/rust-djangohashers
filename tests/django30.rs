@@ -1,4 +1,4 @@
-//! This is an almost line-by-line translation from the hashers' test from Django 1.11:
+//! This is an almost line-by-line translation from the hashers' test from Django 3.0:
 //! https://github.com/django/django/blob/master/tests/auth_tests/test_hashers.py
 //! ...but only for the tests where the iterations differ from Django 1.9.
 
@@ -8,12 +8,12 @@ use djangohashers::*;
 #[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2() {
     let django = Django {
-        version: DjangoVersion::V1_11,
+        version: DjangoVersion::V3_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
     assert!(
         encoded
-            == "pbkdf2_sha256$36000$seasalt$mEUPPFJkT/xtwDU8rB7Q+puHRZnR07WRjerTkt/3HI0="
+            == "pbkdf2_sha256$180000$seasalt$gH56uAM9k5UGHuCzAYqLtJQ7AFgnXEZ4LMzt71ldHoc="
                 .to_string()
     );
     assert!(is_password_usable(&encoded));
@@ -31,12 +31,12 @@ fn test_pbkdf2() {
 #[cfg(feature = "with_pbkdf2")]
 fn test_low_level_pbkdf2() {
     let django = Django {
-        version: DjangoVersion::V1_11,
+        version: DjangoVersion::V3_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2);
     assert!(
         encoded
-            == "pbkdf2_sha256$36000$seasalt2$QkIBVCvGmTmyjPJ5yox2y/jQB8isvgUNK98FxOU1UYo="
+            == "pbkdf2_sha256$180000$seasalt2$42TW7RGTT6FJUY+hv/VNLy7/3F0KbOcvoKmvB6TAnGU="
                 .to_string()
     );
     assert!(check_password("lètmein", &encoded).unwrap());
@@ -46,9 +46,9 @@ fn test_low_level_pbkdf2() {
 #[cfg(feature = "with_pbkdf2")]
 fn test_low_level_pbkdf2_sha1() {
     let django = Django {
-        version: DjangoVersion::V1_11,
+        version: DjangoVersion::V3_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2SHA1);
-    assert!(encoded == "pbkdf2_sha1$36000$seasalt2$GoU+9AubJ/xRkO0WD1Xf3WPxWfE=".to_string());
+    assert!(encoded == "pbkdf2_sha1$180000$seasalt2$y3RFPd5ZY+yJ8pv4soGPYtg2tZo=".to_string());
     assert!(check_password("lètmein", &encoded).unwrap());
 }

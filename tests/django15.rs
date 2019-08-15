@@ -4,14 +4,18 @@
 
 use djangohashers::*;
 
-
 #[test]
-#[cfg(feature="with_pbkdf2")]
+#[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2() {
-    let django = Django {version: DjangoVersion::V1_5};
+    let django = Django {
+        version: DjangoVersion::V1_5,
+    };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
-    assert!(encoded ==
-            "pbkdf2_sha256$10000$seasalt$CWWFdHOWwPnki7HvkcqN9iA2T3KLW1cf2uZ5kvArtVY=".to_string());
+    assert!(
+        encoded
+            == "pbkdf2_sha256$10000$seasalt$CWWFdHOWwPnki7HvkcqN9iA2T3KLW1cf2uZ5kvArtVY="
+                .to_string()
+    );
     assert!(is_password_usable(&encoded));
     assert!(check_password("lètmein", &encoded).unwrap());
     assert!(!check_password("lètmeinz", &encoded).unwrap());
@@ -24,20 +28,26 @@ fn test_pbkdf2() {
 }
 
 #[test]
-#[cfg(feature="with_pbkdf2")]
+#[cfg(feature = "with_pbkdf2")]
 fn test_low_level_pbkdf2() {
-    let django = Django {version: DjangoVersion::V1_5};
+    let django = Django {
+        version: DjangoVersion::V1_5,
+    };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
-    assert!(encoded ==
-            "pbkdf2_sha256$10000$seasalt$CWWFdHOWwPnki7HvkcqN9iA2T3KLW1cf2uZ5kvArtVY="
-                .to_string());
+    assert!(
+        encoded
+            == "pbkdf2_sha256$10000$seasalt$CWWFdHOWwPnki7HvkcqN9iA2T3KLW1cf2uZ5kvArtVY="
+                .to_string()
+    );
     assert!(check_password("lètmein", &encoded).unwrap());
 }
 
 #[test]
-#[cfg(feature="with_pbkdf2")]
+#[cfg(feature = "with_pbkdf2")]
 fn test_low_level_pbkdf2_sha1() {
-    let django = Django {version: DjangoVersion::V1_5};
+    let django = Django {
+        version: DjangoVersion::V1_5,
+    };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2SHA1);
     assert!(encoded == "pbkdf2_sha1$10000$seasalt$oAfF6vgs95ncksAhGXOWf4Okq7o=".to_string());
     assert!(check_password("lètmein", &encoded).unwrap());

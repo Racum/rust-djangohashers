@@ -4,14 +4,18 @@
 
 use djangohashers::*;
 
-
 #[test]
-#[cfg(feature="with_pbkdf2")]
+#[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2() {
-    let django = Django {version: DjangoVersion::V2_0};
+    let django = Django {
+        version: DjangoVersion::V2_0,
+    };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
-    assert!(encoded ==
-            "pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc=".to_string());
+    assert!(
+        encoded
+            == "pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc="
+                .to_string()
+    );
     assert!(is_password_usable(&encoded));
     assert!(check_password("lètmein", &encoded).unwrap());
     assert!(!check_password("lètmeinz", &encoded).unwrap());
@@ -24,20 +28,26 @@ fn test_pbkdf2() {
 }
 
 #[test]
-#[cfg(feature="with_pbkdf2")]
+#[cfg(feature = "with_pbkdf2")]
 fn test_low_level_pbkdf2() {
-    let django = Django {version: DjangoVersion::V2_0};
+    let django = Django {
+        version: DjangoVersion::V2_0,
+    };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2);
-    assert!(encoded ==
-            "pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI="
-                .to_string());
+    assert!(
+        encoded
+            == "pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI="
+                .to_string()
+    );
     assert!(check_password("lètmein", &encoded).unwrap());
 }
 
 #[test]
-#[cfg(feature="with_pbkdf2")]
+#[cfg(feature = "with_pbkdf2")]
 fn test_low_level_pbkdf2_sha1() {
-    let django = Django {version: DjangoVersion::V2_0};
+    let django = Django {
+        version: DjangoVersion::V2_0,
+    };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2SHA1);
     assert!(encoded == "pbkdf2_sha1$100000$seasalt2$dK/dL+ySBZ5zoR0+Zk3SB/VsH0U=".to_string());
     assert!(check_password("lètmein", &encoded).unwrap());
