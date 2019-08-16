@@ -1,6 +1,7 @@
 use crate::crypto_utils;
 use std::str;
 
+#[allow(dead_code)]
 static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_000_000;
 static BCRYPT_COST_DOS_LIMIT: u32 = 16;
 
