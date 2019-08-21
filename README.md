@@ -70,7 +70,7 @@ By default all the hashers are enabled, but you can pick only the hashers that y
 
 ## Fast PBKDF2 Version
 
-Unfortunately rust-crypto’s implementation of PBKDF2 is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
+Unfortunately the crate `pbkdf2` implementation is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
 
 ### Installation
 
