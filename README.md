@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.0"
+djangohashers = "^1.1"
 ```
 
 Reference and import:
@@ -78,7 +78,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.0"
+version = "^1.1"
 features = ["fpbkdf2"]
 ```
 
@@ -104,19 +104,21 @@ For other OSs and package managers, [follow the guide](https://cryptography.io/e
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 1.9.4 | 29.5ms | Baseline
-djangohashers with rust-crypto 0.2.34 (default) | 41.7ms | 41% slower
-djangohashers with fastpbkdf2 0.1.0 | 23.1ms | 28% faster
+Django 2.2.4 on Python 3.7.4 | 69ms | Baseline
+djangohashers with pbkdf2 (default) | 86ms | 25% slower
+djangohashers with fastpbkdf2 | 42ms | 61% faster
 
-Notes:
+Replicate test above with Docker:
 
-* Best of 5 rounds of 100 events.
-* Built with `--release`.
-* PBKDF2 using SHA256 and iteration count set to 24000.
-* Django version tested with CPython 3.5.1
-* Rust/fastpbkdf2 version tested with Rust 1.6.0 and OpenSSL 1.0.2g.
-* iMac Mid 2010 with an Intel Core i3 3.2Ghz and 16GB of RAM, running OS X 10.11.3.
+```
+$ docker build -t rs-dj-hashers-profile .
+...
 
+$ docker run -t rs-dj-hashers-profile
+Hashing time: 69ms (Python 3.7.4, Django 2.2.4).
+Hashing time: 86ms (Vanilla PBKDF2).
+Hashing time: 42ms (Fast PBKDF2).
+```
 
 ## Compatibility
 

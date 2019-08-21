@@ -1,6 +1,6 @@
 [package]
 name = "djangohashers"
-version = "1.1.0"
+version = "1.1.1"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 documentation = "https://docs.rs/djangohashers/"
 license = "BSD-3-Clause"
