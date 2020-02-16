@@ -146,8 +146,6 @@ pub fn check_password_tolerant(password: &str, encoded: &str) -> bool {
 #[derive(Clone)]
 #[allow(non_camel_case_types)]
 pub enum DjangoVersion {
-    /// Current Django version.
-    Current,
     /// Django 1.4.
     V1_4,
     /// Django 1.5.
@@ -174,6 +172,11 @@ pub enum DjangoVersion {
     V3_0,
 }
 
+impl DjangoVersion {
+    /// Current Django version.
+    pub const CURRENT: Self = Self::V2_2;
+}
+
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
 #[allow(unused_variables)]
 fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
@@ -190,7 +193,7 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             DjangoVersion::V1_11 => 36_000,
             DjangoVersion::V2_0 => 100_000,
             DjangoVersion::V2_1 => 120_000,
-            DjangoVersion::V2_2 | DjangoVersion::Current => 150_000,
+            DjangoVersion::V2_2 => 150_000,
             DjangoVersion::V3_0 => 180_000,
         },
         #[cfg(feature = "with_argon2")]
@@ -234,13 +237,13 @@ pub fn make_password_core(
 /// Based on the current Django version, generates an encoded hash given
 /// a complete set of parameters: password, salt and algorithm.
 pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algorithm) -> String {
-    make_password_core(password, salt, algorithm, DjangoVersion::Current)
+    make_password_core(password, salt, algorithm, DjangoVersion::CURRENT)
 }
 
 /// Based on the current Django version, generates an encoded hash given
 /// a password and algorithm, uses a random salt.
 pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> String {
-    make_password_core(password, &random_salt(), algorithm, DjangoVersion::Current)
+    make_password_core(password, &random_salt(), algorithm, DjangoVersion::CURRENT)
 }
 
 mod features {
@@ -285,7 +288,7 @@ pub fn make_password(password: &str) -> String {
         password,
         &random_salt(),
         features::PREFERRED_ALGORITHM,
-        DjangoVersion::Current,
+        DjangoVersion::CURRENT,
     )
 }
 
@@ -406,5 +409,5 @@ fn test_identify_hasher() {
 #[should_panic]
 #[cfg(feature = "with_pbkdf2")]
 fn test_invalid_salt_should_panic() {
-    let _ = make_password_core("pass", "$alt", Algorithm::PBKDF2, DjangoVersion::Current);
+    let _ = make_password_core("pass", "$alt", Algorithm::PBKDF2, DjangoVersion::CURRENT);
 }
