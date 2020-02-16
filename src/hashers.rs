@@ -186,8 +186,7 @@ impl Hasher for BCryptSHA256Hasher {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
         let cost = bcrypt_encoded_part[1]
             .split('$')
-            .skip(2)
-            .next()
+            .nth(2)
             .ok_or(HasherError::BadHash)?
             .parse::<u32>()
             .map_err(|_| HasherError::InvalidIterations)?;
@@ -219,8 +218,7 @@ impl Hasher for BCryptHasher {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
         let cost = bcrypt_encoded_part[1]
             .split('$')
-            .skip(2)
-            .next()
+            .nth(2)
             .ok_or(HasherError::BadHash)?
             .parse::<u32>()
             .map_err(|_| HasherError::InvalidIterations)?;
@@ -319,7 +317,7 @@ impl Hasher for UnsaltedMD5Hasher {
     }
 
     fn encode(&self, password: &str, _: &str, _: u32) -> String {
-        crypto_utils::hash_md5(password, "").to_string()
+        crypto_utils::hash_md5(password, "")
     }
 }
 
