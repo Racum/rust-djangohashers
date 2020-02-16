@@ -243,54 +243,48 @@ pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> Str
     make_password_core(password, &random_salt(), algorithm, DjangoVersion::Current)
 }
 
+mod features {
+    use super::Algorithm;
+
+    #[cfg(feature = "with_pbkdf2")]
+    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::PBKDF2;
+
+    #[cfg(all(not(feature = "with_pbkdf2"), feature = "with_bcrypt"))]
+    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::BCryptSHA256;
+
+    #[cfg(all(
+        not(feature = "with_pbkdf2"),
+        not(feature = "with_bcrypt"),
+        feature = "with_argon2"
+    ))]
+    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::Argon2;
+
+    #[cfg(all(
+        not(feature = "with_pbkdf2"),
+        not(feature = "with_bcrypt"),
+        not(feature = "with_argon2"),
+        feature = "with_legacy"
+    ))]
+    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::SHA1;
+
+    #[cfg(all(
+        not(feature = "with_pbkdf2"),
+        not(feature = "with_bcrypt"),
+        not(feature = "with_argon2"),
+        not(feature = "with_legacy"),
+    ))]
+    compile_error!(
+        r#"At least one of the crypto features ("with_pbkdf2", "with_bcrypt", "with_argon2" or "with_legacy") must be selected."#
+    );
+}
+
 /// Based on the current Django version, generates an encoded hash given
 /// only a password, uses a random salt and the PBKDF2 algorithm.
-
-#[cfg(feature = "with_pbkdf2")]
 pub fn make_password(password: &str) -> String {
     make_password_core(
         password,
         &random_salt(),
-        Algorithm::PBKDF2,
-        DjangoVersion::Current,
-    )
-}
-
-#[cfg(all(not(feature = "with_pbkdf2"), feature = "with_bcrypt"))]
-pub fn make_password(password: &str) -> String {
-    make_password_core(
-        password,
-        &random_salt(),
-        Algorithm::BCryptSHA256,
-        DjangoVersion::Current,
-    )
-}
-
-#[cfg(all(
-    not(feature = "with_pbkdf2"),
-    not(feature = "with_bcrypt"),
-    feature = "with_argon2"
-))]
-pub fn make_password(password: &str) -> String {
-    make_password_core(
-        password,
-        &random_salt(),
-        Algorithm::Argon2,
-        DjangoVersion::Current,
-    )
-}
-
-#[cfg(all(
-    not(feature = "with_pbkdf2"),
-    not(feature = "with_bcrypt"),
-    not(feature = "with_argon2"),
-    feature = "with_legacy"
-))]
-pub fn make_password(password: &str) -> String {
-    make_password_core(
-        password,
-        &random_salt(),
-        Algorithm::SHA1,
+        features::PREFERRED_ALGORITHM,
         DjangoVersion::Current,
     )
 }
@@ -329,52 +323,11 @@ impl Django {
 
     /// Based on the defined Django version, generates an encoded hash given
     /// only a password, uses a random salt and the PBKDF2 algorithm.
-
-    #[cfg(feature = "with_pbkdf2")]
     pub fn make_password(&self, password: &str) -> String {
         make_password_core(
             password,
             &random_salt(),
-            Algorithm::PBKDF2,
-            self.version.clone(),
-        )
-    }
-
-    #[cfg(all(not(feature = "with_pbkdf2"), feature = "with_bcrypt"))]
-    pub fn make_password(&self, password: &str) -> String {
-        make_password_core(
-            password,
-            &random_salt(),
-            Algorithm::BCryptSHA256,
-            self.version.clone(),
-        )
-    }
-
-    #[cfg(all(
-        not(feature = "with_pbkdf2"),
-        not(feature = "with_bcrypt"),
-        feature = "with_argon2"
-    ))]
-    pub fn make_password(&self, password: &str) -> String {
-        make_password_core(
-            password,
-            &random_salt(),
-            Algorithm::Argon2,
-            self.version.clone(),
-        )
-    }
-
-    #[cfg(all(
-        not(feature = "with_pbkdf2"),
-        not(feature = "with_bcrypt"),
-        not(feature = "with_argon2"),
-        feature = "with_legacy"
-    ))]
-    pub fn make_password(&self, password: &str) -> String {
-        make_password_core(
-            password,
-            &random_salt(),
-            Algorithm::SHA1,
+            features::PREFERRED_ALGORITHM,
             self.version.clone(),
         )
     }
