@@ -86,10 +86,7 @@ pub fn hash_md5(password: &str, salt: &str) -> String {
 #[cfg(feature = "with_legacy")]
 pub fn hash_unix_crypt(password: &str, salt: &str) -> String {
     #[allow(deprecated)]
-    match pwhash::unix_crypt::hash_with(salt, password) {
-        Ok(value) => value,
-        Err(_) => "".to_string(),
-    }
+    pwhash::unix_crypt::hash_with(salt, password).unwrap_or_default()
 }
 
 #[cfg(feature = "with_argon2")]
