@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.0] - 2020-02-19
+
+### Added
+
+- Support to Django 3.1.
+
+### Changed
+
+- Cleaner code (thank's @andy128k).
+- Set default Django version to 3.0.
+- Updated dependencies.
+
 ## [1.1.1] - 2019-08-21
 
 ### Added

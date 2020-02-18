@@ -78,7 +78,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.1"
+version = "^1.2"
 features = ["fpbkdf2"]
 ```
 
