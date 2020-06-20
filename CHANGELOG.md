@@ -10,6 +10,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Pure-Rust implementation of Argon2 (cargon -> rust-argon2).
 - Updated dependencies.
 
+### Added
+
+- Support for ARM 64-bit CPUs.
+
 ## [1.2.1] - 2020-06-06
 
 ### Changed
