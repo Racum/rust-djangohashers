@@ -36,6 +36,9 @@ mod fuzzy_tests {
     #[cfg(feature = "with_argon2")]
     quickcheck! {
         fn test_fuzzy_argon2(pwd: String, salt: String) -> TestResult {
+            if salt.len() < 8 {
+                return TestResult::discard();
+            }
             check_algorithm(pwd, encode_config(salt.as_bytes(), URL_SAFE_NO_PAD), Algorithm::Argon2)
         }
     }
