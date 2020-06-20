@@ -96,17 +96,15 @@ impl Hasher for PBKDF2SHA1Hasher {
 pub struct Argon2Hasher;
 
 #[cfg(feature = "with_argon2")]
-const OLD_ARGON2_VERSION: u32 = 0x10;
-#[cfg(feature = "with_argon2")]
-const NEW_ARGON2_VERSION: u32 = 0x13;
+use argon2::{self, Version};
 
 #[cfg(feature = "with_argon2")]
 impl Hasher for Argon2Hasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split('$').collect();
         let version = match encoded_part.len() {
-            6 => NEW_ARGON2_VERSION,
-            5 => OLD_ARGON2_VERSION,
+            6 => Version::Version13,
+            5 => Version::Version10,
             _ => return Err(HasherError::BadHash),
         };
         let segment_shift = 6 - encoded_part.len();
@@ -158,7 +156,7 @@ impl Hasher for Argon2Hasher {
         let memory_cost: u32 = 512; // "kib" in Argon2's lingo.
         let time_cost: u32 = 2; // "passes" in Argon2's lingo.
         let parallelism: u32 = 2; // "lanes" in Argon2's lingo.
-        let version: u32 = NEW_ARGON2_VERSION;
+        let version = Version::Version13;
         let hash_length: u32 = 16;
         let hash = crypto_utils::hash_argon2(
             password,

@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.1"
+djangohashers = "^1.3"
 ```
 
 Reference and import:

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.0] - 2020-06-20
+
+### Changed
+
+- Pure-Rust implementation of Argon2 (cargon -> rust-argon2).
+- Updated dependencies.
 
 ## [1.2.1] - 2020-06-06
 
