@@ -149,13 +149,15 @@ impl Hasher for Argon2Hasher {
         ))
     }
 
-    fn encode(&self, password: &str, salt: &str, _: u32) -> String {
-        // "Profile 1": Settings used in Django 1.10: This may change in the
-        // future, if so, use the "iterations" parameter as a profile input,
-        // and match against it:
-        let memory_cost: u32 = 512; // "kib" in Argon2's lingo.
-        let time_cost: u32 = 2; // "passes" in Argon2's lingo.
-        let parallelism: u32 = 2; // "lanes" in Argon2's lingo.
+    fn encode(&self, password: &str, salt: &str, iterations: u32) -> String {
+        // - memory_cost: "kib" in Argon2's lingo.
+        // - parallelism: "lanes" in Argon2's lingo.
+        // - time_cost: "passes" in Argon2's lingo.
+        let (memory_cost, parallelism, time_cost) = match iterations {
+            1 => (512, 2, 2),
+            2 => (102400, 8, 2),
+            _ => unreachable!()
+        };
         let version = Version::Version13;
         let hash_length: u32 = 16;
         let hash = crypto_utils::hash_argon2(
