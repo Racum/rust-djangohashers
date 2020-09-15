@@ -253,7 +253,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `DjangoVersion::Current` Current Django version (`2.2` for DjangoHashers `1.1.0`).
+* `DjangoVersion::CURRENT` Current Django version (`3.1` for DjangoHashers `1.3.1`).
 * `DjangoVersion::V1_4` Django 1.4
 * `DjangoVersion::V1_5` Django 1.5
 * `DjangoVersion::V1_6` Django 1.6
