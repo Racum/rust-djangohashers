@@ -221,6 +221,7 @@ fn random_salt() -> String {
     rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(12)
+        .map(|x| x as char)
         .collect()
 }
 
