@@ -15,10 +15,12 @@ use argon2::{self, Config, ThreadMode, Variant, Version};
 #[cfg(all(feature = "with_pbkdf2", not(feature = "fpbkdf2")))]
 pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
     let mut result = [0u8; 32];
-    pbkdf2::pbkdf2::<hmac::Hmac<sha2::Sha256>>(
+    use core::num::NonZeroU32;
+    ring::pbkdf2::derive(
+        ring::pbkdf2::PBKDF2_HMAC_SHA256,
+        NonZeroU32::new(iterations as u32).unwrap(),
+        &salt.as_bytes(),
         password.as_bytes(),
-        salt.as_bytes(),
-        iterations,
         &mut result,
     );
     base64::encode_config(&result, base64::STANDARD)
@@ -41,10 +43,12 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
 #[cfg(not(feature = "fpbkdf2"))]
 pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
     let mut result = [0u8; 20];
-    pbkdf2::pbkdf2::<hmac::Hmac<sha1::Sha1>>(
+    use core::num::NonZeroU32;
+    ring::pbkdf2::derive(
+        ring::pbkdf2::PBKDF2_HMAC_SHA1,
+        NonZeroU32::new(iterations as u32).unwrap(),
+        &salt.as_bytes(),
         password.as_bytes(),
-        salt.as_bytes(),
-        iterations,
         &mut result,
     );
     base64::encode_config(&result, base64::STANDARD)
@@ -65,8 +69,8 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
 
 #[cfg(feature = "with_legacy")]
 pub fn hash_sha1(password: &str, salt: &str) -> String {
-    use sha1::{Sha1, Digest};
     use hex_fmt::HexFmt;
+    use sha1::{Digest, Sha1};
     let mut hasher = Sha1::new();
     hasher.update(salt);
     hasher.update(password);
@@ -82,8 +86,8 @@ pub fn hash_sha256(password: &str) -> String {
 
 #[cfg(feature = "with_legacy")]
 pub fn hash_md5(password: &str, salt: &str) -> String {
-    use md5::{Md5, Digest};
     use hex_fmt::HexFmt;
+    use md5::{Digest, Md5};
     let mut hasher = Md5::new();
     hasher.update(salt);
     hasher.update(password);
@@ -116,7 +120,7 @@ pub fn hash_argon2(
         thread_mode: ThreadMode::Parallel,
         secret: &[],
         ad: &[],
-        hash_length: hash_length
+        hash_length: hash_length,
     };
     let salt_bytes = base64::decode(salt).unwrap();
     let result = argon2::hash_raw(password.as_bytes(), &salt_bytes, &config).unwrap();

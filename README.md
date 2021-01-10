@@ -39,7 +39,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.3"
+djangohashers = "^1.4"
 ```
 
 Reference and import:
@@ -70,7 +70,7 @@ By default all the hashers are enabled, but you can pick only the hashers that y
 
 ## Fast PBKDF2 Version
 
-Unfortunately the crate `pbkdf2` implementation is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
+Unfortunately the crate `ring` implementation is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
 
 ### Installation
 
@@ -78,7 +78,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.2"
+version = "^1.4"
 features = ["fpbkdf2"]
 ```
 
@@ -104,9 +104,9 @@ For other OSs and package managers, [follow the guide](https://cryptography.io/e
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 2.2.4 on Python 3.7.4 | 69ms | Baseline
-djangohashers with pbkdf2 (default) | 86ms | 25% slower
-djangohashers with fastpbkdf2 | 42ms | 61% faster
+Django 3.1.5 on Python 3.9.1 | 104ms | Baseline
+djangohashers with ring::pbkdf2 (default) | 112ms | 7.7% slower
+djangohashers with fastpbkdf2 | 65ms | 62.5% faster
 
 Replicate test above with Docker:
 
@@ -115,9 +115,9 @@ $ docker build -t rs-dj-hashers-profile .
 ...
 
 $ docker run -t rs-dj-hashers-profile
-Hashing time: 69ms (Python 3.7.4, Django 2.2.4).
-Hashing time: 86ms (Vanilla PBKDF2).
-Hashing time: 42ms (Fast PBKDF2).
+Hashing time: 104ms (Python 3.9.1, Django 3.1.5).
+Hashing time: 112ms (Vanilla PBKDF2).
+Hashing time: 65ms (Fast PBKDF2).
 ```
 
 ## Compatibility

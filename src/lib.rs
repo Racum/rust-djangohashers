@@ -203,7 +203,8 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             DjangoVersion::V3_2 => 260_000,
         },
         #[cfg(feature = "with_argon2")]
-        Algorithm::Argon2 => match *version { // For Argon2, this means "Profile 1", not actually "1 integration".
+        Algorithm::Argon2 => match *version {
+            // For Argon2, this means "Profile 1", not actually "1 integration".
             DjangoVersion::V3_2 => 2,
             _ => 1,
         },

@@ -156,7 +156,7 @@ impl Hasher for Argon2Hasher {
         let (memory_cost, parallelism, time_cost) = match iterations {
             1 => (512, 2, 2),
             2 => (102400, 8, 2),
-            _ => unreachable!()
+            _ => unreachable!(),
         };
         let version = Version::Version13;
         let hash_length: u32 = 16;

@@ -9,7 +9,7 @@ RUN cargo build --example profile --release --no-default-features --features "wi
     mv target/release/examples/profile bin/fastpbkdf2_profile && \
     rm -rf target/release/examples
 
-FROM python:3.7-slim-buster
+FROM python:3.9-slim-buster
 RUN mkdir /app
 WORKDIR /app
 COPY --from=rust_builder /repo/bin/* /app/

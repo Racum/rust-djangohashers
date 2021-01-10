@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.0] - 2021-01-10
+
+### Changed
+
+- Changed pbkdf2 crate to ring for PBKDF2 algorithms.
+- Updated dependencies.
+
 ## [1.3.2] - 2021-01-02
 
 ### Changed

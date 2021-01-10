@@ -95,5 +95,4 @@ mod fuzzy_tests {
             check_algorithm(pwd, salt, Algorithm::Crypt)
         }
     }
-
 }
