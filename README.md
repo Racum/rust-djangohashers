@@ -102,11 +102,21 @@ For other OSs and package managers, [follow the guide](https://cryptography.io/e
 
 ### Performance
 
+On a Quad-Core Intel Core i7:
+
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 3.1.5 on Python 3.9.1 | 104ms | Baseline
-djangohashers with ring::pbkdf2 (default) | 112ms | 7.7% slower
-djangohashers with fastpbkdf2 | 65ms | 62.5% faster
+Django 3.1.5 on Python 3.9.1 | 104ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 112ms | 107.7% 🐢
+djangohashers with fastpbkdf2 | 65ms | 62.5% 🐇
+
+On a Apple M1:
+
+Method  | Encode or Check | Performance
+------- | --------------- | -------
+Django 3.1.5 on Python 3.9.1 | 37ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 22ms | 59.5% 🐇
+djangohashers with fastpbkdf2 | 14ms | 37.8% 🐇
 
 Replicate test above with Docker:
 
