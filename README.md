@@ -70,7 +70,7 @@ By default all the hashers are enabled, but you can pick only the hashers that y
 
 ## Fast PBKDF2 Version
 
-Unfortunately the crate `ring` implementation is not properly optimized: it does not adhere to the loop inlines and buffering used in [modern implementations](https://jbp.io/2015/08/11/pbkdf2-performance-matters/). The package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL.
+Depending on your platform, OS and version of libraries, it is possible that DjangoHashers can be slower than Python/Django's reference implementation. If performance is critical for your case, there is an [alternatice implementation](https://www.cryptologie.net/article/281/pbkdf2-performance-matters/): the package [fastpbkdf2](https://github.com/ctz/rust-fastpbkdf2) uses a C-binding of a [library](https://github.com/ctz/fastpbkdf2) that requires OpenSSL. If **ring**'s implementation of PBKDF2 reaches this level of optiomization, the **fastpbkdf2** version will be deprecated.
 
 ### Installation
 
@@ -84,18 +84,11 @@ features = ["fpbkdf2"]
 
 You need to install OpenSSL and set the environment variable to make it visible to the compiler; this changes depending on the operation system and package manager, for example, in macOS you may need to do something like this:
 
-Via [Homebrew](http://brew.sh):
-
 ```
 $ brew install openssl
-$ CFLAGS="-I/usr/local/opt/openssl/include" cargo ...
-```
-
-Via [MacPorts](https://www.macports.org):
-
-```
-$ sudo port install openssl
-$ CFLAGS="-I/opt/local/include" cargo ...
+$ export LIBRARY_PATH="$(brew --prefix openssl)/lib"
+$ export CFLAGS="-I$(brew --prefix openssl)/include"
+$ cargo ...
 ```
 
 For other OSs and package managers, [follow the guide](https://cryptography.io/en/latest/installation/) of how to install Python’s **Cryptography** dependencies, that also links against OpenSSL.
