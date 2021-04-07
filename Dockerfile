@@ -1,5 +1,5 @@
 FROM rust:slim-buster AS rust_builder
-RUN apt-get update && apt-get install libssl-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get -y install libssl-dev && rm -rf /var/lib/apt/lists/*
 RUN mkdir /repo && mkdir /repo/bin
 ADD . /repo
 WORKDIR /repo
