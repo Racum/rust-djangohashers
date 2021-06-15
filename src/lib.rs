@@ -221,6 +221,10 @@ fn random_salt() -> String {
         .collect()
 }
 
+lazy_static! {
+    pub static ref VALID_SALT_RE: Regex = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
+}
+
 /// Core function that generates all combinations of passwords:
 pub fn make_password_core(
     password: &str,
@@ -228,9 +232,6 @@ pub fn make_password_core(
     algorithm: Algorithm,
     version: DjangoVersion,
 ) -> String {
-    lazy_static! {
-        static ref VALID_SALT_RE: Regex = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
-    }
 
     assert!(
         VALID_SALT_RE.is_match(salt),
