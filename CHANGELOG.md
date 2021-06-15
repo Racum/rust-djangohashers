@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.2] - 2021-06-15
+
+### Changed
+
+- Cleaner code (thank's @andy128k).
+- Build via GitHub CI (thank's @andy128k).
+
 ## [1.4.1] - 2021-04-07
 
 ### Changed
