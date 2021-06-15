@@ -1,0 +1,41 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{matrix.rust}} ${{matrix.features}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          - nightly
+        features:
+          - ""
+          - --features fpbkdf2
+          - --features "fpbkdf2 fuzzy_tests" --release
+          - --no-default-features --features "with_pbkdf2" --release
+          - --no-default-features --features "with_bcrypt" --release
+          - --no-default-features --features "with_argon2" --release
+          - --no-default-features --features "with_legacy" --release
+          - --no-default-features --features "with_legacy with_bcrypt" --release
+          - --no-default-features --features "with_legacy with_argon2" --release
+          - --no-default-features --features "with_legacy with_legacy" --release
+          - --no-default-features --features "with_bcrypt with_argon2" --release
+          - --no-default-features --features "with_bcrypt with_legacy" --release
+          - --no-default-features --features "with_argon2 with_legacy" --release
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{matrix.rust}}
+        override: true
+
+    - name: Build
+      run: cargo test --verbose --no-fail-fast ${{matrix.features}}
+      env:
+        RUST_BACKTRACE: 1
