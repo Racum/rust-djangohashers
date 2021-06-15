@@ -7,9 +7,11 @@ static SALT: &'static str = "KQ8zeK6wKRuR";
 #[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2_sha256() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::PBKDF2, DjangoVersion::V1_9);
-    let h = "pbkdf2_sha256$24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY=";
-    assert!(encoded == h.to_string());
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha256$24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY="
+    );
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
 }
 
 #[test]
@@ -26,9 +28,11 @@ fn test_pbkdf2_sha256_bad_hash() {
 #[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2_sha1() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::PBKDF2SHA1, DjangoVersion::V1_9);
-    let h = "pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU=";
-    assert!(encoded == h.to_string());
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU="
+    );
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
 }
 
 #[test]
@@ -45,9 +49,11 @@ fn test_pbkdf2_sha1_bad_hash() {
 #[cfg(feature = "with_legacy")]
 fn test_sha1() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::SHA1, DjangoVersion::V1_9);
-    let h = "sha1$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00";
-    assert!(encoded == h.to_string());
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(
+        encoded,
+        "sha1$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00"
+    );
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
 }
 
 #[test]
@@ -61,9 +67,8 @@ fn test_sha1_bad_hash() {
 #[cfg(feature = "with_legacy")]
 fn test_md5() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::MD5, DjangoVersion::V1_9);
-    let h = "md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e";
-    assert!(encoded == h.to_string());
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(encoded, "md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e");
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
 }
 
 #[test]
@@ -77,45 +82,43 @@ fn test_md5_bad_hash() {
 #[cfg(feature = "with_legacy")]
 fn test_unsalted_md5() {
     let encoded = make_password_core(PASSWORD, "", Algorithm::UnsaltedMD5, DjangoVersion::V1_9);
-    let h = "7cf6409a82cd4c8b96a9ecf6ad679119";
-    assert!(encoded == h.to_string());
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(encoded, "7cf6409a82cd4c8b96a9ecf6ad679119");
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
 }
 
 #[test]
 #[cfg(feature = "with_legacy")]
 fn test_unsalted_sha1() {
     let encoded = make_password_core(PASSWORD, "", Algorithm::UnsaltedSHA1, DjangoVersion::V1_9);
-    let h = "sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7";
-    assert!(encoded == h.to_string());
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(encoded, "sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7");
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
 }
 
 #[test]
 #[cfg(feature = "with_bcrypt")]
 fn test_bcrypt_sha256() {
     let encoded = make_password_core(PASSWORD, "", Algorithm::BCryptSHA256, DjangoVersion::V1_9);
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
     let h = "bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPesa1EyXVcTXK";
-    assert!(check_password(PASSWORD, h).unwrap());
+    assert_eq!(check_password(PASSWORD, h), Ok(true));
 }
 
 #[test]
 #[cfg(feature = "with_bcrypt")]
 fn test_bcrypt() {
     let encoded = make_password_core(PASSWORD, "", Algorithm::BCrypt, DjangoVersion::V1_9);
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
     let h = "bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6Y/.";
-    assert!(check_password(PASSWORD, h).unwrap());
+    assert_eq!(check_password(PASSWORD, h), Ok(true));
 }
 
 #[test]
 #[cfg(feature = "with_legacy")]
 fn test_crypt() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::Crypt, DjangoVersion::V1_9);
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
     let h = "crypt$$KQW3RFkgPSuuA";
-    assert!(check_password(PASSWORD, h).unwrap());
+    assert_eq!(check_password(PASSWORD, h), Ok(true));
 }
 
 #[test]
@@ -132,9 +135,9 @@ fn test_crypt_bad_hash() {
 #[cfg(feature = "with_argon2")]
 fn test_argon2() {
     let encoded = make_password_core(PASSWORD, SALT, Algorithm::Argon2, DjangoVersion::V1_10);
-    assert!(check_password(PASSWORD, &encoded).unwrap());
+    assert_eq!(check_password(PASSWORD, &encoded), Ok(true));
     let h = "argon2$argon2i$v=19$m=512,t=2,p=2$S1E4emVLNndLUnVS$RUET3AC8iXvcVPD2TRjvVQ";
-    assert!(check_password(PASSWORD, h).unwrap());
+    assert_eq!(check_password(PASSWORD, h), Ok(true));
 }
 
 #[test]
@@ -142,13 +145,13 @@ fn test_argon2() {
 fn test_argon2_old() {
     // From https://github.com/django/django/blob/master/tests/auth_tests/test_hashers.py
     let old_from_django = "argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg";
-    assert!(check_password("secret", old_from_django).unwrap());
-    assert!(!check_password("wrong", old_from_django).unwrap());
+    assert_eq!(check_password("secret", old_from_django), Ok(true));
+    assert_eq!(check_password("wrong", old_from_django), Ok(false));
     // From https://github.com/hynek/argon2_cffi/blob/master/tests/test_low_level.py
     // ...prefixed with "argon2$", emulating Django's format:
     let old_from_argon2_cffi = "argon2$argon2i$m=65536,t=2,p=4$c29tZXNhbHQAAAAAAAAAAA$QWLzI4TY9HkL2ZTLc8g6SinwdhZewYrzz9zxCo0bkGY";
-    assert!(check_password("password", old_from_argon2_cffi).unwrap());
-    assert!(!check_password("wrong", old_from_argon2_cffi).unwrap());
+    assert_eq!(check_password("password", old_from_argon2_cffi), Ok(true));
+    assert_eq!(check_password("wrong", old_from_argon2_cffi), Ok(false));
 }
 
 #[test]

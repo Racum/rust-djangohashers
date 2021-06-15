@@ -19,6 +19,7 @@ pub use crate::hashers::*;
 
 /// Algorithms available to use with Hashers.
 #[derive(PartialEq)]
+#[cfg_attr(test, derive(Debug))]
 pub enum Algorithm {
     /// PBKDF2 key-derivation function with the SHA256 hashing algorithm.
     #[cfg(feature = "with_pbkdf2")]
@@ -64,8 +65,8 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
         }
     }
 
-    let encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
-    match encoded_part[0] {
+    let encoded_part: &str = encoded.split('$').next()?;
+    match encoded_part {
         #[cfg(feature = "with_pbkdf2")]
         "pbkdf2_sha256" => Some(Algorithm::PBKDF2),
         #[cfg(feature = "with_pbkdf2")]
@@ -114,32 +115,22 @@ fn get_hasher(algorithm: &Algorithm) -> Box<dyn Hasher + 'static> {
 
 /// Verifies if an encoded hash is properly formatted before check it cryptographically.
 pub fn is_password_usable(encoded: &str) -> bool {
-    match identify_hasher(encoded) {
-        Some(_) => !(encoded == "" || encoded.starts_with('!')),
-        None => false,
-    }
+    !encoded.is_empty() && !encoded.starts_with('!') && identify_hasher(encoded).is_some()
 }
 
 /// Verifies a password against an encoded hash, returns a Result.
 pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError> {
-    if encoded == "" {
+    if encoded.is_empty() {
         return Err(HasherError::EmptyHash);
     }
-    match identify_hasher(encoded) {
-        Some(algorithm) => {
-            let hasher = get_hasher(&algorithm);
-            hasher.verify(password, encoded)
-        }
-        None => Err(HasherError::UnknownAlgorithm),
-    }
+    let algorithm = identify_hasher(encoded).ok_or(HasherError::UnknownAlgorithm)?;
+    let hasher = get_hasher(&algorithm);
+    hasher.verify(password, encoded)
 }
 
 /// Verifies a password against an encoded hash, returns a boolean, even in case of error.
 pub fn check_password_tolerant(password: &str, encoded: &str) -> bool {
-    match check_password(password, encoded) {
-        Ok(valid) => valid,
-        Err(_) => false,
-    }
+    check_password(password, encoded).unwrap_or(false)
 }
 
 /// Django Version.
@@ -230,10 +221,6 @@ fn random_salt() -> String {
         .collect()
 }
 
-lazy_static! {
-    pub static ref VALID_SALT_RE: Regex = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
-}
-
 /// Core function that generates all combinations of passwords:
 pub fn make_password_core(
     password: &str,
@@ -241,6 +228,10 @@ pub fn make_password_core(
     algorithm: Algorithm,
     version: DjangoVersion,
 ) -> String {
+    lazy_static! {
+        static ref VALID_SALT_RE: Regex = Regex::new(r"^[A-Za-z0-9]*$").unwrap();
+    }
+
     assert!(
         VALID_SALT_RE.is_match(salt),
         "Salt can only contain letters and numbers."
@@ -355,60 +346,65 @@ impl Django {
 fn test_identify_hasher() {
     // Good hashes:
     #[cfg(feature = "with_pbkdf2")]
-    assert!(
+    assert_eq!(
         identify_hasher(
             "pbkdf2_sha256$24000$KQ8zeK6wKRuR$cmhbSt1XVKuO4FGd9+AX8qSBD4Z0395nZatXTJpEtTY="
-        )
-        .unwrap()
-            == Algorithm::PBKDF2
+        ),
+        Some(Algorithm::PBKDF2)
     );
     #[cfg(feature = "with_pbkdf2")]
-    assert!(
-        identify_hasher("pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU=").unwrap()
-            == Algorithm::PBKDF2SHA1
+    assert_eq!(
+        identify_hasher("pbkdf2_sha1$24000$KQ8zeK6wKRuR$tSJh4xdxfMJotlxfkCGjTFpGYZU="),
+        Some(Algorithm::PBKDF2SHA1)
     );
     #[cfg(feature = "with_legacy")]
-    assert!(
-        identify_hasher("sha1$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00").unwrap()
-            == Algorithm::SHA1
+    assert_eq!(
+        identify_hasher("sha1$KQ8zeK6wKRuR$f83371bca01fa6089456e673ccfb17f42d810b00"),
+        Some(Algorithm::SHA1)
     );
     #[cfg(feature = "with_legacy")]
-    assert!(
-        identify_hasher("md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e").unwrap()
-            == Algorithm::MD5
+    assert_eq!(
+        identify_hasher("md5$KQ8zeK6wKRuR$0137e4d74cb2d9ed9cb1a5f391f6175e"),
+        Some(Algorithm::MD5)
     );
     #[cfg(feature = "with_legacy")]
-    assert!(identify_hasher("7cf6409a82cd4c8b96a9ecf6ad679119").unwrap() == Algorithm::UnsaltedMD5);
+    assert_eq!(
+        identify_hasher("7cf6409a82cd4c8b96a9ecf6ad679119"),
+        Some(Algorithm::UnsaltedMD5)
+    );
     #[cfg(feature = "with_legacy")]
-    assert!(identify_hasher("md5$$7cf6409a82cd4c8b96a9ecf6ad679119").unwrap() == Algorithm::MD5);
+    assert_eq!(
+        identify_hasher("md5$$7cf6409a82cd4c8b96a9ecf6ad679119"),
+        Some(Algorithm::MD5)
+    );
     #[cfg(feature = "with_legacy")]
-    assert!(
-        identify_hasher("sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7").unwrap()
-            == Algorithm::UnsaltedSHA1
+    assert_eq!(
+        identify_hasher("sha1$$22e6217f026c7a395f0840c1ffbdb163072419e7"),
+        Some(Algorithm::UnsaltedSHA1)
     );
     #[cfg(feature = "with_bcrypt")]
-    assert!(
+    assert_eq!(
         identify_hasher(
             "bcrypt_sha256$$2b$12$LZSJchsWG/DrBy1erNs4eeYo6tZNlLFQmONdxN9HPesa1EyXVcTXK"
-        )
-        .unwrap()
-            == Algorithm::BCryptSHA256
+        ),
+        Some(Algorithm::BCryptSHA256)
     );
     #[cfg(feature = "with_bcrypt")]
-    assert!(
-        identify_hasher("bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6Y/.")
-            .unwrap()
-            == Algorithm::BCrypt
+    assert_eq!(
+        identify_hasher("bcrypt$$2b$12$LZSJchsWG/DrBy1erNs4ee31eJ7DaWiuwhDOC7aqIyqGGggfu6Y/."),
+        Some(Algorithm::BCrypt)
     );
     #[cfg(feature = "with_legacy")]
-    assert!(identify_hasher("crypt$$ab1Hv2Lg7ltQo").unwrap() == Algorithm::Crypt);
+    assert_eq!(
+        identify_hasher("crypt$$ab1Hv2Lg7ltQo"),
+        Some(Algorithm::Crypt)
+    );
     #[cfg(feature = "with_argon2")]
-    assert!(
+    assert_eq!(
         identify_hasher(
             "argon2$argon2i$v=19$m=512,t=2,p=2$MktOZjRsaTBNWnVp$/s1VqdEUfHOPKJyIokwa2A"
-        )
-        .unwrap()
-            == Algorithm::Argon2
+        ),
+        Some(Algorithm::Argon2)
     );
 
     // Bad hashes:

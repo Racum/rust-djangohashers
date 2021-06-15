@@ -115,19 +115,18 @@ impl Hasher for Argon2Hasher {
         let settings_part: Vec<&str> = settings.split(',').collect();
         let memory_cost: u32 = settings_part[0].split('=').collect::<Vec<&str>>()[1]
             .parse::<u32>()
-            .unwrap();
+            .map_err(|_| HasherError::BadHash)?;
         let time_cost: u32 = settings_part[1].split('=').collect::<Vec<&str>>()[1]
             .parse::<u32>()
-            .unwrap();
+            .map_err(|_| HasherError::BadHash)?;
         let parallelism: u32 = settings_part[2].split('=').collect::<Vec<&str>>()[1]
             .parse::<u32>()
-            .unwrap();
+            .map_err(|_| HasherError::BadHash)?;
 
         // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
-        match base64::decode_config(salt, base64::URL_SAFE_NO_PAD) {
-            Ok(_) => {}
-            Err(_) => return Err(HasherError::InvalidArgon2Salt),
-        };
+        if base64::decode_config(salt, base64::URL_SAFE_NO_PAD).is_err() {
+            return Err(HasherError::InvalidArgon2Salt);
+        }
 
         // Argon2 has a flexible hash length:
         let hash_length = match base64::decode_config(hash, base64::URL_SAFE_NO_PAD) {
@@ -195,10 +194,7 @@ impl Hasher for BCryptSHA256Hasher {
         }
         let hash = bcrypt_encoded_part[1];
         let hashed_password = crypto_utils::hash_sha256(password);
-        match bcrypt::verify(&hashed_password, hash) {
-            Ok(valid) => Ok(valid),
-            Err(_) => Ok(false),
-        }
+        Ok(bcrypt::verify(&hashed_password, hash).unwrap_or(false))
     }
 
     fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
@@ -226,10 +222,7 @@ impl Hasher for BCryptHasher {
             return Err(HasherError::InvalidIterations);
         }
         let hash = bcrypt_encoded_part[1];
-        match bcrypt::verify(password, hash) {
-            Ok(valid) => Ok(valid),
-            Err(_) => Ok(false),
-        }
+        Ok(bcrypt::verify(password, hash).unwrap_or(false))
     }
 
     fn encode(&self, password: &str, _: &str, iterations: u32) -> String {

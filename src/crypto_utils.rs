@@ -113,14 +113,14 @@ pub fn hash_argon2(
 ) -> String {
     let config = Config {
         variant: Variant::Argon2i,
-        version: version,
+        version,
         mem_cost: memory_cost,
-        time_cost: time_cost,
+        time_cost,
         lanes: parallelism,
         thread_mode: ThreadMode::Parallel,
         secret: &[],
         ad: &[],
-        hash_length: hash_length,
+        hash_length,
     };
     let salt_bytes = base64::decode(salt).unwrap();
     let result = argon2::hash_raw(password.as_bytes(), &salt_bytes, &config).unwrap();

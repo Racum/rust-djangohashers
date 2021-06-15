@@ -11,20 +11,19 @@ fn test_pbkdf2() {
         version: DjangoVersion::V2_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
-    assert!(
-        encoded
-            == "pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc="
-                .to_string()
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc="
     );
     assert!(is_password_usable(&encoded));
-    assert!(check_password("lètmein", &encoded).unwrap());
-    assert!(!check_password("lètmeinz", &encoded).unwrap());
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
+    assert_eq!(check_password("lètmeinz", &encoded), Ok(false));
     // Blank passwords
     let blank_encoded = django.make_password_with_settings("", "seasalt", Algorithm::PBKDF2);
     assert!(blank_encoded.starts_with("pbkdf2_sha256$"));
     assert!(is_password_usable(&blank_encoded));
-    assert!(check_password("", &blank_encoded).unwrap());
-    assert!(!check_password(" ", &blank_encoded).unwrap());
+    assert_eq!(check_password("", &blank_encoded), Ok(true));
+    assert_eq!(check_password(" ", &blank_encoded), Ok(false));
 }
 
 #[test]
@@ -34,12 +33,11 @@ fn test_low_level_pbkdf2() {
         version: DjangoVersion::V2_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2);
-    assert!(
-        encoded
-            == "pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI="
-                .to_string()
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI="
     );
-    assert!(check_password("lètmein", &encoded).unwrap());
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
 }
 
 #[test]
@@ -49,6 +47,9 @@ fn test_low_level_pbkdf2_sha1() {
         version: DjangoVersion::V2_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2SHA1);
-    assert!(encoded == "pbkdf2_sha1$100000$seasalt2$dK/dL+ySBZ5zoR0+Zk3SB/VsH0U=".to_string());
-    assert!(check_password("lètmein", &encoded).unwrap());
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha1$100000$seasalt2$dK/dL+ySBZ5zoR0+Zk3SB/VsH0U="
+    );
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
 }

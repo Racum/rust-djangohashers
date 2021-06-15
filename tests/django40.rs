@@ -11,20 +11,19 @@ fn test_pbkdf2() {
         version: DjangoVersion::V4_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::PBKDF2);
-    assert!(
-        encoded
-            == "pbkdf2_sha256$320000$seasalt$Toj2II2rBvFiGQcPmUml1Nlni2UtvyRWwz/jz4q6q/4="
-                .to_string()
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha256$320000$seasalt$Toj2II2rBvFiGQcPmUml1Nlni2UtvyRWwz/jz4q6q/4="
     );
     assert!(is_password_usable(&encoded));
-    assert!(check_password("lètmein", &encoded).unwrap());
-    assert!(!check_password("lètmeinz", &encoded).unwrap());
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
+    assert_eq!(check_password("lètmeinz", &encoded), Ok(false));
     // Blank passwords
     let blank_encoded = django.make_password_with_settings("", "seasalt", Algorithm::PBKDF2);
     assert!(blank_encoded.starts_with("pbkdf2_sha256$"));
     assert!(is_password_usable(&blank_encoded));
-    assert!(check_password("", &blank_encoded).unwrap());
-    assert!(!check_password(" ", &blank_encoded).unwrap());
+    assert_eq!(check_password("", &blank_encoded), Ok(true));
+    assert_eq!(check_password(" ", &blank_encoded), Ok(false));
 }
 
 #[test]
@@ -34,12 +33,11 @@ fn test_low_level_pbkdf2() {
         version: DjangoVersion::V4_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2);
-    assert!(
-        encoded
-            == "pbkdf2_sha256$320000$seasalt2$BRr4pYNIQDsLFP+u4dzjs7pFuWJEin4lFMMoO9wBYvo="
-                .to_string()
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha256$320000$seasalt2$BRr4pYNIQDsLFP+u4dzjs7pFuWJEin4lFMMoO9wBYvo="
     );
-    assert!(check_password("lètmein", &encoded).unwrap());
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
 }
 
 #[test]
@@ -49,8 +47,11 @@ fn test_low_level_pbkdf2_sha1() {
         version: DjangoVersion::V4_0,
     };
     let encoded = django.make_password_with_settings("lètmein", "seasalt2", Algorithm::PBKDF2SHA1);
-    assert!(encoded == "pbkdf2_sha1$320000$seasalt2$sDOkTvzV93jPWTRVxFGh50Jefo0=".to_string());
-    assert!(check_password("lètmein", &encoded).unwrap());
+    assert_eq!(
+        encoded,
+        "pbkdf2_sha1$320000$seasalt2$sDOkTvzV93jPWTRVxFGh50Jefo0="
+    );
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
 }
 
 #[test]
@@ -62,12 +63,12 @@ fn test_argon2() {
     let encoded = django.make_password_with_algorithm("lètmein", Algorithm::Argon2);
     assert!(is_password_usable(&encoded));
     assert!(encoded.starts_with("argon2$"));
-    assert!(check_password("lètmein", &encoded).unwrap());
-    assert!(!check_password("lètmeinz", &encoded).unwrap());
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
+    assert_eq!(check_password("lètmeinz", &encoded), Ok(false));
     // Blank passwords
     let blank_encoded = django.make_password_with_algorithm("", Algorithm::Argon2);
     assert!(blank_encoded.starts_with("argon2$"));
     assert!(is_password_usable(&blank_encoded));
-    assert!(check_password("", &blank_encoded).unwrap());
-    assert!(!check_password(" ", &blank_encoded).unwrap());
+    assert_eq!(check_password("", &blank_encoded), Ok(true));
+    assert_eq!(check_password(" ", &blank_encoded), Ok(false));
 }
