@@ -27,6 +27,7 @@ jobs:
           - --no-default-features --features "with_bcrypt with_argon2" --release
           - --no-default-features --features "with_bcrypt with_legacy" --release
           - --no-default-features --features "with_argon2 with_legacy" --release
+          - --no-default-features --features "with_scrypt with_pbkdf2" --release
 
     steps:
     - uses: actions/checkout@v1

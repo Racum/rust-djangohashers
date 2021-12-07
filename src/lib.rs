@@ -285,12 +285,18 @@ mod features {
         not(feature = "with_pbkdf2"),
         not(feature = "with_bcrypt"),
         not(feature = "with_argon2"),
+        feature = "with_scrypt"
+    ))]
+    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::Scrypt;
+
+    #[cfg(all(
+        not(feature = "with_pbkdf2"),
+        not(feature = "with_bcrypt"),
+        not(feature = "with_argon2"),
+        not(feature = "with_scrypt"),
         feature = "with_legacy"
     ))]
     pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::SHA1;
-
-    #[cfg(feature = "with_scrypt")]
-    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::Scrypt;
 
     #[cfg(all(
         not(feature = "with_pbkdf2"),
