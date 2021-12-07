@@ -19,6 +19,7 @@ jobs:
           - --no-default-features --features "with_pbkdf2" --release
           - --no-default-features --features "with_bcrypt" --release
           - --no-default-features --features "with_argon2" --release
+          - --no-default-features --features "with_scrypt" --release
           - --no-default-features --features "with_legacy" --release
           - --no-default-features --features "with_legacy with_bcrypt" --release
           - --no-default-features --features "with_legacy with_argon2" --release

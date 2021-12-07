@@ -95,4 +95,11 @@ mod fuzzy_tests {
             check_algorithm(pwd, salt, Algorithm::Crypt)
         }
     }
+
+    #[cfg(feature = "with_scrypt")]
+    quickcheck! {
+        fn test_fuzzy_scrypt(pwd: String, salt: String) -> TestResult {
+            check_algorithm(pwd, salt, Algorithm::Scrypt)
+        }
+    }
 }

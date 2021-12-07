@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.0] - 2021-12-08
+
+### Added
+
+- Support to ScryptHasher (added on Django 4.0).
+- Support to Django 4.1.
+
+### Changed
+
+- Set default Django version to 4.0.
+- Updated dependencies.
+
 ## [1.4.3] - 2021-06-18
 
 ### Changed

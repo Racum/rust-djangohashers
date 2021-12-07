@@ -61,6 +61,7 @@ By default all the hashers are enabled, but you can pick only the hashers that y
 * `default`: all hashers.
 * `with_pbkdf2`: only **PBKDF2** and **PBKDF2SHA1**.
 * `with_argon2`: only **Argon2**.
+* `with_scrypt`: only **Scrypt**.
 * `with_bcrypt`: only **BCrypt** and **BCryptSHA256**.
 * `with_legacy`: only **SHA1**, **MD5**, **UnsaltedSHA1**, **UnsaltedMD5** and **Crypt**.
 * `fpbkdf2`: enables **Fast PBKDF2** (requires OpenSSL, see below).
@@ -199,6 +200,7 @@ Available algorithms:
 * `Algorithm::PBKDF2` (default)
 * `Algorithm::PBKDF2SHA1`
 * `Algorithm::Argon2`
+* `Algorithm::Scrypt`
 * `Algorithm::BCryptSHA256`
 * `Algorithm::BCrypt`
 * `Algorithm::SHA1`
@@ -254,7 +256,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `DjangoVersion::CURRENT` Current Django version (`3.2` for DjangoHashers `1.4.1`).
+* `DjangoVersion::CURRENT` Current Django version (`4.0` for DjangoHashers `1.5.0`).
 * `DjangoVersion::V1_4` Django 1.4
 * `DjangoVersion::V1_5` Django 1.5
 * `DjangoVersion::V1_6` Django 1.6
@@ -270,6 +272,7 @@ Available versions:
 * `DjangoVersion::V3_1` Django 3.1
 * `DjangoVersion::V3_2` Django 3.2
 * `DjangoVersion::V4_0` Django 4.0
+* `DjangoVersion::V4_1` Django 4.1
 
 ### Verifying a Hash Format (pre-crypto)
 

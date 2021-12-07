@@ -3,7 +3,8 @@
 #[cfg(any(
     feature = "with_pbkdf2",
     feature = "with_argon2",
-    feature = "with_legacy"
+    feature = "with_legacy",
+    feature = "with_scrypt"
 ))]
 pub fn safe_eq(a: &str, b: String) -> bool {
     constant_time_eq::constant_time_eq(a.as_bytes(), b.as_bytes())
@@ -125,4 +126,21 @@ pub fn hash_argon2(
     let salt_bytes = base64::decode(salt).unwrap();
     let result = argon2::hash_raw(password.as_bytes(), &salt_bytes, &config).unwrap();
     base64::encode_config(&result, base64::URL_SAFE_NO_PAD)
+}
+
+#[cfg(feature = "with_scrypt")]
+use scrypt::{scrypt, Params};
+
+#[cfg(feature = "with_scrypt")]
+pub fn hash_scrypt(
+    password: &str,
+    salt: &str,
+    work_factor: u8,
+    block_size: u32,
+    parallelism: u32,
+) -> String {
+    let mut buf = [0u8; 64];
+    let params = Params::new(work_factor, block_size, parallelism).unwrap();
+    scrypt(password.as_bytes(), salt.as_bytes(), &params, &mut buf).unwrap();
+    base64::encode_config(&buf, base64::STANDARD)
 }

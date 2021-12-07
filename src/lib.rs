@@ -30,6 +30,9 @@ pub enum Algorithm {
     /// Argon2 key-derivation function.
     #[cfg(feature = "with_argon2")]
     Argon2,
+    /// Scrypt key-derivation function.
+    #[cfg(feature = "with_scrypt")]
+    Scrypt,
     /// Bcrypt key-derivation function with the password padded with SHA256.
     #[cfg(feature = "with_bcrypt")]
     BCryptSHA256,
@@ -73,6 +76,8 @@ fn identify_hasher(encoded: &str) -> Option<Algorithm> {
         "pbkdf2_sha1" => Some(Algorithm::PBKDF2SHA1),
         #[cfg(feature = "with_argon2")]
         "argon2" => Some(Algorithm::Argon2),
+        #[cfg(feature = "with_scrypt")]
+        "scrypt" => Some(Algorithm::Scrypt),
         #[cfg(feature = "with_bcrypt")]
         "bcrypt_sha256" => Some(Algorithm::BCryptSHA256),
         #[cfg(feature = "with_bcrypt")]
@@ -96,6 +101,8 @@ fn get_hasher(algorithm: &Algorithm) -> Box<dyn Hasher + 'static> {
         Algorithm::PBKDF2SHA1 => Box::new(PBKDF2SHA1Hasher),
         #[cfg(feature = "with_argon2")]
         Algorithm::Argon2 => Box::new(Argon2Hasher),
+        #[cfg(feature = "with_scrypt")]
+        Algorithm::Scrypt => Box::new(ScryptHasher),
         #[cfg(feature = "with_bcrypt")]
         Algorithm::BCryptSHA256 => Box::new(BCryptSHA256Hasher),
         #[cfg(feature = "with_bcrypt")]
@@ -167,11 +174,13 @@ pub enum DjangoVersion {
     V3_2,
     /// Django 4.0.
     V4_0,
+    /// Django 4.1.
+    V4_1,
 }
 
 impl DjangoVersion {
     /// Current Django version.
-    pub const CURRENT: Self = Self::V3_2;
+    pub const CURRENT: Self = Self::V4_0;
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -195,14 +204,18 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             DjangoVersion::V3_1 => 216_000,
             DjangoVersion::V3_2 => 260_000,
             DjangoVersion::V4_0 => 320_000,
+            DjangoVersion::V4_1 => 390_000,
         },
         #[cfg(feature = "with_argon2")]
         Algorithm::Argon2 => match *version {
             // For Argon2, this means "Profile 1", not actually "1 integration".
             DjangoVersion::V3_2 => 2,
             DjangoVersion::V4_0 => 2,
+            DjangoVersion::V4_1 => 2,
             _ => 1,
         },
+        #[cfg(feature = "with_scrypt")]
+        Algorithm::Scrypt => 1,
         #[cfg(feature = "with_legacy")]
         Algorithm::SHA1
         | Algorithm::MD5
@@ -232,7 +245,6 @@ pub fn make_password_core(
     algorithm: Algorithm,
     version: DjangoVersion,
 ) -> String {
-
     assert!(
         VALID_SALT_RE.is_match(salt),
         "Salt can only contain letters and numbers."
@@ -277,14 +289,18 @@ mod features {
     ))]
     pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::SHA1;
 
+    #[cfg(feature = "with_scrypt")]
+    pub const PREFERRED_ALGORITHM: Algorithm = Algorithm::Scrypt;
+
     #[cfg(all(
         not(feature = "with_pbkdf2"),
         not(feature = "with_bcrypt"),
         not(feature = "with_argon2"),
         not(feature = "with_legacy"),
+        not(feature = "with_scrypt"),
     ))]
     compile_error!(
-        r#"At least one of the crypto features ("with_pbkdf2", "with_bcrypt", "with_argon2" or "with_legacy") must be selected."#
+        r#"At least one of the crypto features ("with_pbkdf2", "with_bcrypt", "with_argon2", "with_scrypt" or "with_legacy") must be selected."#
     );
 }
 
@@ -406,6 +422,13 @@ fn test_identify_hasher() {
             "argon2$argon2i$v=19$m=512,t=2,p=2$MktOZjRsaTBNWnVp$/s1VqdEUfHOPKJyIokwa2A"
         ),
         Some(Algorithm::Argon2)
+    );
+    #[cfg(feature = "with_scrypt")]
+    assert_eq!(
+        identify_hasher(
+            "scrypt$16384$seasalt$8$1$Qj3+9PPyRjSJIebHnG81TMjsqtaIGxNQG/aEB/NYafTJ7tibgfYz71m0ldQESkXFRkdVCBhhY8mx7rQwite/Pw=="
+        ),
+        Some(Algorithm::Scrypt)
     );
 
     // Bad hashes:

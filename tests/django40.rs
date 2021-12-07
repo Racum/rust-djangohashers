@@ -72,3 +72,25 @@ fn test_argon2() {
     assert_eq!(check_password("", &blank_encoded), Ok(true));
     assert_eq!(check_password(" ", &blank_encoded), Ok(false));
 }
+
+#[test]
+#[cfg(feature = "with_scrypt")]
+fn test_scrypt() {
+    let django = Django {
+        version: DjangoVersion::V4_0,
+    };
+    let encoded = django.make_password_with_settings("lètmein", "seasalt", Algorithm::Scrypt);
+    assert_eq!(
+        encoded,
+        "scrypt$16384$seasalt$8$1$Qj3+9PPyRjSJIebHnG81TMjsqtaIGxNQG/aEB/NYafTJ7tibgfYz71m0ldQESkXFRkdVCBhhY8mx7rQwite/Pw=="
+    );
+    assert!(is_password_usable(&encoded));
+    assert_eq!(check_password("lètmein", &encoded), Ok(true));
+    assert_eq!(check_password("lètmeinz", &encoded), Ok(false));
+    // Blank passwords
+    let blank_encoded = django.make_password_with_settings("", "seasalt", Algorithm::Scrypt);
+    assert!(blank_encoded.starts_with("scrypt$"));
+    assert!(is_password_usable(&blank_encoded));
+    assert_eq!(check_password("", &blank_encoded), Ok(true));
+    assert_eq!(check_password(" ", &blank_encoded), Ok(false));
+}

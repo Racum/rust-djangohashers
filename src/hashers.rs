@@ -175,6 +175,48 @@ impl Hasher for Argon2Hasher {
     }
 }
 
+/// Hasher that uses the Scrypt function (new in Django 4.0).
+#[cfg(feature = "with_scrypt")]
+pub struct ScryptHasher;
+
+#[cfg(feature = "with_scrypt")]
+impl Hasher for ScryptHasher {
+    fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
+        let encoded_part: Vec<&str> = encoded.split('$').collect();
+        let work_factor: u8 = encoded_part[1]
+            .parse::<f32>()
+            .ok_or(HasherError::BadHash)?
+            .log2() as u8;
+        let salt = encoded_part[2];
+        let block_size = encoded_part[3].parse::<u32>().ok_or(HasherError::BadHash)?;
+        let parallelism = encoded_part[4].parse::<u32>().ok_or(HasherError::BadHash)?;
+        let hash = encoded_part[5];
+        Ok(crypto_utils::safe_eq(
+            hash,
+            crypto_utils::hash_scrypt(password, salt, work_factor, block_size, parallelism),
+        ))
+    }
+
+    fn encode(&self, password: &str, salt: &str, iterations: u32) -> String {
+        // - work_factor: "n" in Scrypt's lingo.
+        // - block_size: "r" in Scrypt's lingo.
+        // - parallelism: "p" in Scrypt's lingo.
+        let (work_factor, block_size, parallelism) = match iterations {
+            1 => (14, 8, 1),
+            _ => unreachable!(),
+        };
+        let hash = crypto_utils::hash_scrypt(password, salt, work_factor, block_size, parallelism);
+        format!(
+            "scrypt${}${}${}${}${}",
+            2i32.pow(work_factor as u32),
+            salt,
+            block_size,
+            parallelism,
+            hash
+        )
+    }
+}
+
 /// Hasher that uses the bcrypt key-derivation function with the password padded with SHA256.
 #[cfg(feature = "with_bcrypt")]
 pub struct BCryptSHA256Hasher;
