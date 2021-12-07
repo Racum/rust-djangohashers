@@ -183,13 +183,10 @@ pub struct ScryptHasher;
 impl Hasher for ScryptHasher {
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split('$').collect();
-        let work_factor: u8 = encoded_part[1]
-            .parse::<f32>()
-            .ok_or(HasherError::BadHash)?
-            .log2() as u8;
+        let work_factor: u8 = encoded_part[1].parse::<f32>().unwrap().log2() as u8;
         let salt = encoded_part[2];
-        let block_size = encoded_part[3].parse::<u32>().ok_or(HasherError::BadHash)?;
-        let parallelism = encoded_part[4].parse::<u32>().ok_or(HasherError::BadHash)?;
+        let block_size = encoded_part[3].parse::<u32>().unwrap();
+        let parallelism = encoded_part[4].parse::<u32>().unwrap();
         let hash = encoded_part[5];
         Ok(crypto_utils::safe_eq(
             hash,
