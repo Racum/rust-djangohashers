@@ -18,7 +18,7 @@ doctest = false
 bench = true
 
 [features]
-default = ["with_pbkdf2", "with_argon2", "with_bcrypt", "with_legacy"]
+default = ["with_pbkdf2", "with_argon2", "with_scrypt", "with_bcrypt", "with_legacy"]
 with_pbkdf2 = ["base64", "constant_time_eq", "ring"]
 with_argon2 = ["base64", "constant_time_eq", "rust-argon2"]
 with_scrypt = ["base64", "constant_time_eq", "scrypt"]
