@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.2] - 2022-01-05
+
+### Changed
+
+- Argon2 hasher now encodes as Argon2id variant.
+
 ## [1.5.1] - 2021-12-07
 
 ### Changed

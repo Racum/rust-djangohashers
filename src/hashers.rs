@@ -169,7 +169,7 @@ impl Hasher for Argon2Hasher {
             hash_length,
         );
         format!(
-            "argon2$argon2i$v=19$m={},t={},p={}${}${}",
+            "argon2$argon2id$v=19$m={},t={},p={}${}${}",
             memory_cost, time_cost, parallelism, salt, hash
         )
     }

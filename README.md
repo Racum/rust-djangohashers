@@ -26,7 +26,7 @@ Output:
 
 ```
 $ cargo run --quiet --example tldr
-Hash: "pbkdf2_sha256$30000$E2DtC4weM2DY$ZTso63dGXbq+QdVGUwq8Y05RgyUc3AsUSfswqUOZ3xc="
+Hash: "pbkdf2_sha256$320000$DRS73FotAFZu$D2AIuViusevhmorNckmUd7irPGOcGWxOvpwsWygeBTU="
 Is valid: true
 ```
 
@@ -37,7 +37,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.4"
+djangohashers = "^1.5"
 ```
 
 Reference and import:
@@ -61,7 +61,7 @@ By default all the hashers are enabled, but you can pick only the hashers that y
 * `default`: all hashers.
 * `with_pbkdf2`: only **PBKDF2** and **PBKDF2SHA1**.
 * `with_argon2`: only **Argon2**.
-* `with_scrypt`: only **Scrypt**.
+* `with_scrypt`: only **Scrypt**. (new in `1.5.0`)
 * `with_bcrypt`: only **BCrypt** and **BCryptSHA256**.
 * `with_legacy`: only **SHA1**, **MD5**, **UnsaltedSHA1**, **UnsaltedMD5** and **Crypt**.
 * `fpbkdf2`: enables **Fast PBKDF2** (requires OpenSSL, see below).
@@ -77,7 +77,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.4"
+version = "^1.5"
 features = ["fpbkdf2"]
 ```
 
@@ -98,17 +98,17 @@ On a Quad-Core Intel Core i7:
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 3.1.5 on Python 3.9.1 | 104ms | 100% (baseline)
-djangohashers with ring::pbkdf2 (default) | 112ms | 107.7% 🐢
-djangohashers with fastpbkdf2 | 65ms | 62.5% 🐇
+Django 4.0.1 on Python 3.10.1 | 153ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 162ms | 105.9% 🐢
+djangohashers with fastpbkdf2 | 95ms | 62.1% 🐇
 
 On a Apple M1:
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 3.1.5 on Python 3.9.1 | 37ms | 100% (baseline)
-djangohashers with ring::pbkdf2 (default) | 22ms | 59.5% 🐇
-djangohashers with fastpbkdf2 | 14ms | 37.8% 🐇
+Django 4.0.1 on Python 3.10.1 | 57ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 30ms | 52.6% 🐇
+djangohashers with fastpbkdf2 | 21ms | 36.8% 🐇
 
 Replicate test above with Docker:
 
@@ -117,14 +117,14 @@ $ docker build -t rs-dj-hashers-profile .
 ...
 
 $ docker run -t rs-dj-hashers-profile
-Hashing time: 104ms (Python 3.9.1, Django 3.1.5).
-Hashing time: 112ms (Vanilla PBKDF2).
-Hashing time: 65ms (Fast PBKDF2).
+Hashing time: 153ms (Python 3.10.1, Django 4.0.1).
+Hashing time: 162ms (Vanilla PBKDF2).
+Hashing time: 95ms (Fast PBKDF2).
 ```
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 2.2, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 4.1, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
