@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.5] - 2022-02-23
+
+### Changed
+
+- Updated bcrypt dependency.
+
 ## [1.5.4] - 2022-02-18
 
 ### Changed
