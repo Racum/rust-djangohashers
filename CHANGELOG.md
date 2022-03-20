@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.7] - 2022-03-20
+
+### Changed
+
+- Updated dependencies.
+
 ## [1.5.6] - 2022-02-28
 
 ### Changed
