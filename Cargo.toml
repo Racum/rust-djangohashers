@@ -1,6 +1,6 @@
 [package]
 name = "djangohashers"
-version = "1.5.8"
+version = "1.5.9"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 documentation = "https://docs.rs/djangohashers/"
 license = "BSD-3-Clause"
@@ -16,6 +16,9 @@ edition = "2018"
 doc = true
 doctest = false
 bench = true
+
+[profile.dev.package."*"]
+opt-level = 1
 
 [features]
 default = ["with_pbkdf2", "with_argon2", "with_scrypt", "with_bcrypt", "with_legacy"]
