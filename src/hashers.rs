@@ -1,6 +1,11 @@
 use crate::crypto_utils;
 use std::str;
 
+#[cfg(any(feature = "with_argon2"))]
+use base64::engine::general_purpose;
+#[cfg(any(feature = "with_argon2"))]
+use base64::engine::Engine as _;
+
 #[cfg(feature = "with_pbkdf2")]
 static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_000_000;
 #[cfg(feature = "with_bcrypt")]
@@ -124,12 +129,12 @@ impl Hasher for Argon2Hasher {
             .map_err(|_| HasherError::BadHash)?;
 
         // Django's implementation expects a Base64-encoded salt, if it is not, return an error:
-        if base64::decode_config(salt, base64::URL_SAFE_NO_PAD).is_err() {
+        if general_purpose::URL_SAFE_NO_PAD.decode(hash).is_err() {
             return Err(HasherError::InvalidArgon2Salt);
         }
 
         // Argon2 has a flexible hash length:
-        let hash_length = match base64::decode_config(hash, base64::URL_SAFE_NO_PAD) {
+        let hash_length = match general_purpose::URL_SAFE_NO_PAD.decode(hash) {
             Ok(value) => value.len() as u32,
             Err(_) => return Ok(false),
         };

@@ -3,6 +3,19 @@
 #[cfg(any(
     feature = "with_pbkdf2",
     feature = "with_argon2",
+    feature = "with_scrypt"
+))]
+use base64::engine::general_purpose;
+#[cfg(any(
+    feature = "with_pbkdf2",
+    feature = "with_argon2",
+    feature = "with_scrypt"
+))]
+use base64::engine::Engine as _;
+
+#[cfg(any(
+    feature = "with_pbkdf2",
+    feature = "with_argon2",
     feature = "with_legacy",
     feature = "with_scrypt"
 ))]
@@ -24,7 +37,7 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
         password.as_bytes(),
         &mut result,
     );
-    base64::encode_config(&result, base64::STANDARD)
+    general_purpose::STANDARD.encode(&result)
 }
 
 #[cfg(feature = "with_pbkdf2")]
@@ -37,7 +50,7 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
         iterations,
         &mut result,
     );
-    base64::encode_config(&result, base64::STANDARD)
+    general_purpose::STANDARD.encode(&result)
 }
 
 #[cfg(feature = "with_pbkdf2")]
@@ -52,7 +65,7 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
         password.as_bytes(),
         &mut result,
     );
-    base64::encode_config(&result, base64::STANDARD)
+    general_purpose::STANDARD.encode(&result)
 }
 
 #[cfg(feature = "with_pbkdf2")]
@@ -65,7 +78,7 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
         iterations,
         &mut result,
     );
-    base64::encode_config(&result, base64::STANDARD)
+    general_purpose::STANDARD.encode(&result)
 }
 
 #[cfg(feature = "with_legacy")]
@@ -123,9 +136,9 @@ pub fn hash_argon2(
         ad: &[],
         hash_length,
     };
-    let salt_bytes = base64::decode(salt).unwrap();
+    let salt_bytes = general_purpose::URL_SAFE_NO_PAD.decode(salt).unwrap();
     let result = argon2::hash_raw(password.as_bytes(), &salt_bytes, &config).unwrap();
-    base64::encode_config(&result, base64::URL_SAFE_NO_PAD)
+    general_purpose::URL_SAFE_NO_PAD.encode(&result)
 }
 
 #[cfg(feature = "with_scrypt")]
@@ -142,5 +155,5 @@ pub fn hash_scrypt(
     let mut buf = [0u8; 64];
     let params = Params::new(work_factor, block_size, parallelism).unwrap();
     scrypt(password.as_bytes(), salt.as_bytes(), &params, &mut buf).unwrap();
-    base64::encode_config(&buf, base64::STANDARD)
+    general_purpose::STANDARD.encode(&buf)
 }

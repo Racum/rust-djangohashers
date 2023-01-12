@@ -4,9 +4,9 @@ mod fuzzy_tests {
     use quickcheck::{quickcheck, TestResult};
 
     #[cfg(feature = "with_argon2")]
-    extern crate base64;
+    use base64::engine::general_purpose;
     #[cfg(feature = "with_argon2")]
-    use self::base64::{encode_config, URL_SAFE_NO_PAD};
+    use base64::engine::Engine as _;
 
     fn check_algorithm(pwd: String, salt: String, algorithm: Algorithm) -> TestResult {
         if !VALID_SALT_RE.is_match(&salt) {
@@ -39,7 +39,7 @@ mod fuzzy_tests {
             if salt.len() < 8 {
                 return TestResult::discard();
             }
-            check_algorithm(pwd, encode_config(salt.as_bytes(), URL_SAFE_NO_PAD), Algorithm::Argon2)
+            check_algorithm(pwd, general_purpose::URL_SAFE_NO_PAD.encode(salt.as_bytes()), Algorithm::Argon2)
         }
     }
 
