@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.10] - 2023-01-12
+
+### Changed
+
+- Updated base64 dependency.
+
 ## [1.5.9] - 2022-08-21
 
 ### Changed
