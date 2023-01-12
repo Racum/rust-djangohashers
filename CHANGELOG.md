@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.6.0] - 2023-01-13
+
+### Added
+
+- Support to Django 4.2.
+
+### Changed
+
+- Set default Django version to 4.1.
+
 ## [1.5.10] - 2023-01-12
 
 ### Changed

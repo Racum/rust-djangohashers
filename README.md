@@ -37,7 +37,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.5"
+djangohashers = "^1.6"
 ```
 
 Reference and import:
@@ -77,7 +77,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.5"
+version = "^1.6"
 features = ["fpbkdf2"]
 ```
 
@@ -124,7 +124,7 @@ Hashing time: 95ms (Fast PBKDF2).
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 4.1, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 4.2, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
