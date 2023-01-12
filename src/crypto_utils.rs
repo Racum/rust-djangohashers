@@ -1,6 +1,16 @@
 //! Set of cryptographic functions to simplify the Hashers.
 
+#[cfg(any(
+    feature = "with_pbkdf2",
+    feature = "with_argon2",
+    feature = "with_scrypt"
+))]
 use base64::engine::general_purpose;
+#[cfg(any(
+    feature = "with_pbkdf2",
+    feature = "with_argon2",
+    feature = "with_scrypt"
+))]
 use base64::engine::Engine as _;
 
 #[cfg(any(

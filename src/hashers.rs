@@ -1,7 +1,9 @@
 use crate::crypto_utils;
 use std::str;
 
+#[cfg(any(feature = "with_argon2"))]
 use base64::engine::general_purpose;
+#[cfg(any(feature = "with_argon2"))]
 use base64::engine::Engine as _;
 
 #[cfg(feature = "with_pbkdf2")]
