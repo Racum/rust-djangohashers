@@ -40,7 +40,7 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
         iterations,
         &mut result,
     );
-    base64::encode_config(&result, base64::STANDARD)
+    general_purpose::STANDARD.encode(&result)
 }
 
 #[cfg(feature = "with_pbkdf2")]
@@ -68,7 +68,7 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
         iterations,
         &mut result,
     );
-    base64::encode_config(&result, base64::STANDARD)
+    general_purpose::STANDARD.encode(&result)
 }
 
 #[cfg(feature = "with_legacy")]
