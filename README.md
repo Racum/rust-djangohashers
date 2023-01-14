@@ -26,7 +26,7 @@ Output:
 
 ```
 $ cargo run --quiet --example tldr
-Hash: "pbkdf2_sha256$320000$DRS73FotAFZu$D2AIuViusevhmorNckmUd7irPGOcGWxOvpwsWygeBTU="
+Hash: "pbkdf2_sha256$390000$7HRd1YJBZvYj$Rc3BW6f7ss3CShWkULiXI9Rxj7CDdstBeoyCgFFQaK0="
 Is valid: true
 ```
 
@@ -54,14 +54,12 @@ use djangohashers::{check_password, make_password, Algorithm};
 
 ## Compiling Features
 
-> New in `0.3.0`.
-
 By default all the hashers are enabled, but you can pick only the hashers that you need to avoid unneeded dependencies.
 
 * `default`: all hashers.
 * `with_pbkdf2`: only **PBKDF2** and **PBKDF2SHA1**.
 * `with_argon2`: only **Argon2**.
-* `with_scrypt`: only **Scrypt**. (new in `1.5.0`)
+* `with_scrypt`: only **Scrypt**.
 * `with_bcrypt`: only **BCrypt** and **BCryptSHA256**.
 * `with_legacy`: only **SHA1**, **MD5**, **UnsaltedSHA1**, **UnsaltedMD5** and **Crypt**.
 * `fpbkdf2`: enables **Fast PBKDF2** (requires OpenSSL, see below).
@@ -98,17 +96,17 @@ On a Quad-Core Intel Core i7:
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 4.0.1 on Python 3.10.1 | 153ms | 100% (baseline)
-djangohashers with ring::pbkdf2 (default) | 162ms | 105.9% 🐢
-djangohashers with fastpbkdf2 | 95ms | 62.1% 🐇
+Django 4.1.5 on Python 3.11.1 | 189ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 145ms | 76.7% 🐇
+djangohashers with fastpbkdf2 | 119ms | 62.9 🐇
 
 On a Apple M1:
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 4.0.1 on Python 3.10.1 | 57ms | 100% (baseline)
-djangohashers with ring::pbkdf2 (default) | 30ms | 52.6% 🐇
-djangohashers with fastpbkdf2 | 21ms | 36.8% 🐇
+Django 4.1.5 on Python 3.11.1 | 65ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 38ms | 58.5% 🐇
+djangohashers with fastpbkdf2 | 26ms | 40.0% 🐇
 
 Replicate test above with Docker:
 
@@ -117,9 +115,9 @@ $ docker build -t rs-dj-hashers-profile .
 ...
 
 $ docker run -t rs-dj-hashers-profile
-Hashing time: 153ms (Python 3.10.1, Django 4.0.1).
-Hashing time: 162ms (Vanilla PBKDF2).
-Hashing time: 95ms (Fast PBKDF2).
+Hashing time: 65ms (Python 3.11.1, Django 4.1.5).
+Hashing time: 38ms (Vanilla PBKDF2).
+Hashing time: 26ms (Fast PBKDF2).
 ```
 
 ## Compatibility
@@ -239,8 +237,6 @@ let encoded = make_password_with_settings("KRONOS", "seasalt", Algorithm::PBKDF2
 
 ### Generating a Hashed Password based on a Django version
 
-> New in `0.2.1`.
-
 Django versions can have different number of iterations for hashers based on PBKDF2 and BCrypt algorithms; this abstraction makes possible to generate a password with the same number of iterations used in that versions.
 
 ```rust
@@ -273,6 +269,7 @@ Available versions:
 * `DjangoVersion::V3_2` Django 3.2
 * `DjangoVersion::V4_0` Django 4.0
 * `DjangoVersion::V4_1` Django 4.1
+* `DjangoVersion::V4_1` Django 4.2
 
 ### Verifying a Hash Format (pre-crypto)
 
