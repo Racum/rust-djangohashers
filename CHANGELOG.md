@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.6.1] - 2023-02-08
+
+### Added
+
+- Support to Django 5.0
+
+### Changed
+
+- Updated PBKDF2 iterations to 600000 for Django 4.2.
+- Updated bcrypt dependency.
+
 ## [1.6.0] - 2023-01-13
 
 ### Added
