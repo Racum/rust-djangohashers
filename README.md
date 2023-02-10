@@ -122,7 +122,7 @@ Hashing time: 26ms (Fast PBKDF2).
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 4.2, there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 4.1 (and betas of 4.2 and 5.0), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
@@ -269,8 +269,8 @@ Available versions:
 * `DjangoVersion::V3_2` Django 3.2
 * `DjangoVersion::V4_0` Django 4.0
 * `DjangoVersion::V4_1` Django 4.1
-* `DjangoVersion::V4_1` Django 4.2
-* `DjangoVersion::V4_1` Django 5.0
+* `DjangoVersion::V4_2` Django 4.2
+* `DjangoVersion::V5_0` Django 5.0
 
 ### Verifying a Hash Format (pre-crypto)
 
