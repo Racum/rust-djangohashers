@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.6.3] - 2023-03-09
+
+### Changed
+
+- Updated scrypt dependency.
+
 ## [1.6.2] - 2023-02-10
 
 ### Changed

@@ -152,8 +152,9 @@ pub fn hash_scrypt(
     block_size: u32,
     parallelism: u32,
 ) -> String {
-    let mut buf = [0u8; 64];
-    let params = Params::new(work_factor, block_size, parallelism).unwrap();
+    const KEY_SIZE: usize = 64;
+    let mut buf = [0u8; KEY_SIZE];
+    let params = Params::new(work_factor, block_size, parallelism, KEY_SIZE).unwrap();
     scrypt(password.as_bytes(), salt.as_bytes(), &params, &mut buf).unwrap();
     general_purpose::STANDARD.encode(&buf)
 }
