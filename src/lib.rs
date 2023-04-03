@@ -184,7 +184,7 @@ pub enum DjangoVersion {
 
 impl DjangoVersion {
     /// Current Django version.
-    pub const CURRENT: Self = Self::V4_1;
+    pub const CURRENT: Self = Self::V4_2;
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
