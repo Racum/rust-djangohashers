@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.6.6] - 2023-04-22
+
+### Changed
+
+- No changes, just applied clippy fixes.
+
 ## [1.6.5] - 2023-04-03
 
 ### Changed

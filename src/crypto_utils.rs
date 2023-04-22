@@ -32,12 +32,12 @@ pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String
     use core::num::NonZeroU32;
     ring::pbkdf2::derive(
         ring::pbkdf2::PBKDF2_HMAC_SHA256,
-        NonZeroU32::new(iterations as u32).unwrap(),
-        &salt.as_bytes(),
+        NonZeroU32::new(iterations).unwrap(),
+        salt.as_bytes(),
         password.as_bytes(),
         &mut result,
     );
-    general_purpose::STANDARD.encode(&result)
+    general_purpose::STANDARD.encode(result)
 }
 
 #[cfg(feature = "with_pbkdf2")]
@@ -60,12 +60,12 @@ pub fn hash_pbkdf2_sha1(password: &str, salt: &str, iterations: u32) -> String {
     use core::num::NonZeroU32;
     ring::pbkdf2::derive(
         ring::pbkdf2::PBKDF2_HMAC_SHA1,
-        NonZeroU32::new(iterations as u32).unwrap(),
-        &salt.as_bytes(),
+        NonZeroU32::new(iterations).unwrap(),
+        salt.as_bytes(),
         password.as_bytes(),
         &mut result,
     );
-    general_purpose::STANDARD.encode(&result)
+    general_purpose::STANDARD.encode(result)
 }
 
 #[cfg(feature = "with_pbkdf2")]
@@ -138,7 +138,7 @@ pub fn hash_argon2(
     };
     let salt_bytes = general_purpose::URL_SAFE_NO_PAD.decode(salt).unwrap();
     let result = argon2::hash_raw(password.as_bytes(), &salt_bytes, &config).unwrap();
-    general_purpose::URL_SAFE_NO_PAD.encode(&result)
+    general_purpose::URL_SAFE_NO_PAD.encode(result)
 }
 
 #[cfg(feature = "with_scrypt")]
@@ -156,5 +156,5 @@ pub fn hash_scrypt(
     let mut buf = [0u8; KEY_SIZE];
     let params = Params::new(work_factor, block_size, parallelism, KEY_SIZE).unwrap();
     scrypt(password.as_bytes(), salt.as_bytes(), &params, &mut buf).unwrap();
-    general_purpose::STANDARD.encode(&buf)
+    general_purpose::STANDARD.encode(buf)
 }

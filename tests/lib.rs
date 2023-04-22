@@ -1,7 +1,7 @@
 use djangohashers::*;
 
-static PASSWORD: &'static str = "ExjGmyUT73bFoT";
-static SALT: &'static str = "KQ8zeK6wKRuR";
+static PASSWORD: &str = "ExjGmyUT73bFoT";
+static SALT: &str = "KQ8zeK6wKRuR";
 
 #[test]
 #[cfg(feature = "with_pbkdf2")]
