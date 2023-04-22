@@ -238,12 +238,12 @@ impl Hasher for BCryptSHA256Hasher {
         }
         let hash = bcrypt_encoded_part[1];
         let hashed_password = crypto_utils::hash_sha256(password);
-        Ok(bcrypt::verify(&hashed_password, hash).unwrap_or(false))
+        Ok(bcrypt::verify(hashed_password, hash).unwrap_or(false))
     }
 
     fn encode(&self, password: &str, _: &str, iterations: u32) -> String {
         let hashed_password = crypto_utils::hash_sha256(password);
-        let hash = bcrypt::hash(&hashed_password, iterations).unwrap();
+        let hash = bcrypt::hash(hashed_password, iterations).unwrap();
         format!("{}${}", "bcrypt_sha256", hash)
     }
 }

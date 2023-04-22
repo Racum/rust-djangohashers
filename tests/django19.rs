@@ -194,12 +194,12 @@ fn test_bcrypt() {
 fn test_unusable() {
     let encoded = "!Q24gQu9Sy3X1PJPCaEMTRrw5eLFWY8htI2FsqCbC"; // From make_password(None)
     assert!(encoded.len() == 41);
-    assert!(!is_password_usable(&encoded));
-    assert!(check_password(&encoded, &encoded).is_err());
-    assert!(check_password("!", &encoded).is_err());
-    assert!(check_password("", &encoded).is_err());
-    assert!(check_password("lètmein", &encoded).is_err());
-    assert!(check_password("lètmeinz", &encoded).is_err());
+    assert!(!is_password_usable(encoded));
+    assert!(check_password(encoded, encoded).is_err());
+    assert!(check_password("!", encoded).is_err());
+    assert!(check_password("", encoded).is_err());
+    assert!(check_password("lètmein", encoded).is_err());
+    assert!(check_password("lètmeinz", encoded).is_err());
 }
 
 // Scenario not possible during run time:
