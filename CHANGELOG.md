@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.6.7] - 2023-06-21
+
+### Changed
+
+- Updated constant_time_eq dependency.
+
 ## [1.6.6] - 2023-04-22
 
 ### Changed
