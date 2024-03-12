@@ -1,6 +1,6 @@
 [package]
 name = "djangohashers"
-version = "1.7.2"
+version = "1.7.3"
 authors = ["Ronaldo Racum <ronaldo@racum.com>"]
 documentation = "https://docs.rs/djangohashers/"
 license = "BSD-3-Clause"
@@ -39,7 +39,7 @@ sha-1 = { version = "^0.10", optional = true }
 sha2 = { version = "^0.10", optional = true }
 ring = { version = "^0.17", default-features = false, optional = true }
 bcrypt = { version = "^0.15", optional = true }
-base64 = { version = "^0.21", optional = true }
+base64 = { version = "^0.22", optional = true }
 pwhash = { version = "^1.0", default-features = false, optional = true }
 fastpbkdf2 = { version = "^0.1", optional = true }
 rust-argon2 = { version = "^2.0", optional = true }
