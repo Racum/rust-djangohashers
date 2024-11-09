@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.4] - 2024-10-09
+
+### Added
+
+- Support to Django 5.2.
+
+### Changed
+
+- Set default Django version to 5.1.
+
 ## [1.7.3] - 2024-03-12
 
 ### Changed
