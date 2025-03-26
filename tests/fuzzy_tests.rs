@@ -1,12 +1,12 @@
 #[cfg(feature = "fuzzy_tests")]
 mod fuzzy_tests {
     use djangohashers::*;
-    use quickcheck::{quickcheck, TestResult};
+    use quickcheck::{TestResult, quickcheck};
 
     #[cfg(feature = "with_argon2")]
-    use base64::engine::general_purpose;
-    #[cfg(feature = "with_argon2")]
     use base64::engine::Engine as _;
+    #[cfg(feature = "with_argon2")]
+    use base64::engine::general_purpose;
 
     fn check_algorithm(pwd: String, salt: String, algorithm: Algorithm) -> TestResult {
         if !VALID_SALT_RE.is_match(&salt) {

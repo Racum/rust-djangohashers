@@ -5,13 +5,13 @@
     feature = "with_argon2",
     feature = "with_scrypt"
 ))]
-use base64::engine::general_purpose;
+use base64::engine::Engine as _;
 #[cfg(any(
     feature = "with_pbkdf2",
     feature = "with_argon2",
     feature = "with_scrypt"
 ))]
-use base64::engine::Engine as _;
+use base64::engine::general_purpose;
 
 #[cfg(any(
     feature = "with_pbkdf2",
@@ -141,7 +141,7 @@ pub fn hash_argon2(
 }
 
 #[cfg(feature = "with_scrypt")]
-use scrypt::{scrypt, Params};
+use scrypt::{Params, scrypt};
 
 #[cfg(feature = "with_scrypt")]
 pub fn hash_scrypt(

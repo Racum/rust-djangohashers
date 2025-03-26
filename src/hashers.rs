@@ -2,9 +2,9 @@ use crate::crypto_utils;
 use std::str;
 
 #[cfg(feature = "with_argon2")]
-use base64::engine::general_purpose;
-#[cfg(feature = "with_argon2")]
 use base64::engine::Engine as _;
+#[cfg(feature = "with_argon2")]
+use base64::engine::general_purpose;
 
 #[cfg(feature = "with_pbkdf2")]
 static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_000_000;

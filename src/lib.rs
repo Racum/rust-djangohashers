@@ -9,8 +9,8 @@
 //! model is already battle-tested.
 
 use lazy_static::lazy_static;
-use rand::distributions::Alphanumeric;
 use rand::Rng;
+use rand::distr::Alphanumeric;
 mod crypto_utils;
 mod hashers;
 use regex::Regex;
@@ -221,11 +221,20 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
         #[cfg(feature = "with_argon2")]
         Algorithm::Argon2 => match *version {
             // For Argon2, this means "Profile 1", not actually "1 integration".
-            DjangoVersion::V3_2 => 2,
-            DjangoVersion::V4_0 => 2,
-            DjangoVersion::V4_1 => 2,
-            DjangoVersion::V4_2 => 2,
-            _ => 1,
+            DjangoVersion::V1_4
+            | DjangoVersion::V1_5
+            | DjangoVersion::V1_6
+            | DjangoVersion::V1_7
+            | DjangoVersion::V1_8
+            | DjangoVersion::V1_9
+            | DjangoVersion::V1_10
+            | DjangoVersion::V1_11
+            | DjangoVersion::V2_0
+            | DjangoVersion::V2_1
+            | DjangoVersion::V2_2
+            | DjangoVersion::V3_0
+            | DjangoVersion::V3_1 => 1,
+            _ => 2,
         },
         #[cfg(feature = "with_scrypt")]
         Algorithm::Scrypt => 1,
@@ -240,7 +249,7 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
 
 /// Generates a random salt.
 fn random_salt() -> String {
-    rand::thread_rng()
+    rand::rng()
         .sample_iter(&Alphanumeric)
         .take(12)
         .map(|x| x as char)
