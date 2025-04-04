@@ -184,11 +184,13 @@ pub enum DjangoVersion {
     V5_1,
     /// Django 5.2.
     V5_2,
+    /// Django 5.3.
+    V5_3,
 }
 
 impl DjangoVersion {
     /// Current Django version.
-    pub const CURRENT: Self = Self::V5_1;
+    pub const CURRENT: Self = Self::V5_2;
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -217,6 +219,7 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             DjangoVersion::V5_0 => 720_000,
             DjangoVersion::V5_1 => 870_000,
             DjangoVersion::V5_2 => 1_000_000,
+            DjangoVersion::V5_3 => 1_200_000,
         },
         #[cfg(feature = "with_argon2")]
         Algorithm::Argon2 => match *version {

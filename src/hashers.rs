@@ -7,7 +7,7 @@ use base64::engine::Engine as _;
 use base64::engine::general_purpose;
 
 #[cfg(feature = "with_pbkdf2")]
-static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_000_000;
+static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_200_000;
 #[cfg(feature = "with_bcrypt")]
 static BCRYPT_COST_DOS_LIMIT: u32 = 16;
 

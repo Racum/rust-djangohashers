@@ -1,4 +1,4 @@
-FROM rust:slim-buster AS rust_builder
+FROM rust:slim AS rust_builder
 RUN apt-get update && apt-get -y install libssl-dev && rm -rf /var/lib/apt/lists/*
 RUN mkdir /repo && mkdir /repo/bin
 ADD . /repo
@@ -9,7 +9,7 @@ RUN cargo build --example profile --release --no-default-features --features "wi
     mv target/release/examples/profile bin/fastpbkdf2_profile && \
     rm -rf target/release/examples
 
-FROM python:3.11-slim-buster
+FROM python:slim
 RUN mkdir /app
 WORKDIR /app
 COPY --from=rust_builder /repo/bin/* /app/

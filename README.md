@@ -26,7 +26,7 @@ Output:
 
 ```
 $ cargo run --quiet --example tldr
-Hash: "pbkdf2_sha256$390000$7HRd1YJBZvYj$Rc3BW6f7ss3CShWkULiXI9Rxj7CDdstBeoyCgFFQaK0="
+Hash: "pbkdf2_sha256$1000000$pQE1Pfr1CUpS$gDLIrbspb7isluj1zxcItegXxrE1BJP3sdg61S+72rw="
 Is valid: true
 ```
 
@@ -37,7 +37,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.7"
+djangohashers = "^1.8"
 ```
 
 Reference and import:
@@ -75,7 +75,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.7"
+version = "^1.8"
 features = ["fpbkdf2"]
 ```
 
@@ -92,21 +92,13 @@ For other OSs and package managers, [follow the guide](https://cryptography.io/e
 
 ### Performance
 
-On a Quad-Core Intel Core i7:
+On a Apple M4 Pro:
 
 Method  | Encode or Check | Performance
 ------- | --------------- | -------
-Django 4.1.5 on Python 3.11.1 | 189ms | 100% (baseline)
-djangohashers with ring::pbkdf2 (default) | 145ms | 76.7% 🐇
-djangohashers with fastpbkdf2 | 119ms | 62.9 🐇
-
-On a Apple M1:
-
-Method  | Encode or Check | Performance
-------- | --------------- | -------
-Django 4.1.5 on Python 3.11.1 | 65ms | 100% (baseline)
-djangohashers with ring::pbkdf2 (default) | 38ms | 58.5% 🐇
-djangohashers with fastpbkdf2 | 26ms | 40.0% 🐇
+Django 5.2.0 on Python 3.13.2 | 136ms | 100% (baseline)
+djangohashers with ring::pbkdf2 (default) | 77ms | 56.6% 🐇
+djangohashers with fastpbkdf2 | 49ms | 36.0% 🐇
 
 Replicate test above with Docker:
 
@@ -115,14 +107,14 @@ $ docker build -t rs-dj-hashers-profile .
 ...
 
 $ docker run -t rs-dj-hashers-profile
-Hashing time: 65ms (Python 3.11.1, Django 4.1.5).
-Hashing time: 38ms (Vanilla PBKDF2).
-Hashing time: 26ms (Fast PBKDF2).
+Hashing time: 136ms (Python 3.13.2, Django 5.2.0).
+Hashing time: 77ms (Vanilla PBKDF2).
+Hashing time: 49ms (Fast PBKDF2).
 ```
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 5.1 (and beta of 5.2), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 5.2 (and beta of 5.3), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
@@ -252,7 +244,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `DjangoVersion::CURRENT` Current Django version (`5.1` for DjangoHashers `1.7.4`).
+* `DjangoVersion::CURRENT` Current Django version (`5.2` for DjangoHashers `1.8.1`).
 * `DjangoVersion::V1_4` Django 1.4
 * `DjangoVersion::V1_5` Django 1.5
 * `DjangoVersion::V1_6` Django 1.6
@@ -273,6 +265,7 @@ Available versions:
 * `DjangoVersion::V5_0` Django 5.0
 * `DjangoVersion::V5_1` Django 5.1
 * `DjangoVersion::V5_2` Django 5.2
+* `DjangoVersion::V5_3` Django 5.3
 
 ### Verifying a Hash Format (pre-crypto)
 
