@@ -24,7 +24,7 @@ pub fn safe_eq(a: &str, b: String) -> bool {
 }
 
 #[cfg(feature = "with_argon2")]
-use argon2::{self, Config, Variant, Version};
+use argon2::{self, Config, ThreadMode, Variant, Version};
 
 #[cfg(all(feature = "with_pbkdf2", not(feature = "fpbkdf2")))]
 pub fn hash_pbkdf2_sha256(password: &str, salt: &str, iterations: u32) -> String {
@@ -131,6 +131,7 @@ pub fn hash_argon2(
         mem_cost: memory_cost,
         time_cost,
         lanes: parallelism,
+        thread_mode: ThreadMode::Parallel,
         secret: &[],
         ad: &[],
         hash_length,

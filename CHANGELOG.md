@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.8.2] - 2025-08-10
+
+### Changed
+
+- Updated rust-argon2 dependency.
+
 ## [1.8.1] - 2024-04-04
 
 ### Added
