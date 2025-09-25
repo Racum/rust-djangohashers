@@ -114,7 +114,7 @@ Hashing time: 49ms (Fast PBKDF2).
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 5.2 (and beta of 5.3), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 5.2 (and betas up to 6.1), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
@@ -244,7 +244,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `DjangoVersion::CURRENT` Current Django version (`5.2` for DjangoHashers `1.8.1`).
+* `DjangoVersion::CURRENT` Current Django version (`5.2` for DjangoHashers `1.8.3`).
 * `DjangoVersion::V1_4` Django 1.4
 * `DjangoVersion::V1_5` Django 1.5
 * `DjangoVersion::V1_6` Django 1.6
@@ -265,7 +265,8 @@ Available versions:
 * `DjangoVersion::V5_0` Django 5.0
 * `DjangoVersion::V5_1` Django 5.1
 * `DjangoVersion::V5_2` Django 5.2
-* `DjangoVersion::V5_3` Django 5.3
+* `DjangoVersion::V6_0` Django 6.0
+* `DjangoVersion::V6_0` Django 6.1
 
 ### Verifying a Hash Format (pre-crypto)
 

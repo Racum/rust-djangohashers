@@ -7,7 +7,7 @@ use base64::engine::Engine as _;
 use base64::engine::general_purpose;
 
 #[cfg(feature = "with_pbkdf2")]
-static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_200_000;
+static PBKDF2_ITERATIONS_DOS_LIMIT: u32 = 1_500_000;
 #[cfg(feature = "with_bcrypt")]
 static BCRYPT_COST_DOS_LIMIT: u32 = 16;
 
@@ -21,7 +21,7 @@ pub enum HasherError {
     /// Hash string is empty.
     EmptyHash,
     /// Number of iterations is not a positive integer.
-    InvalidIterations,
+    InvalidIterations, // Check PBKDF2_ITERATIONS_DOS_LIMIT.
     /// Argon2 salt should be Base64 encoded.
     InvalidArgon2Salt,
 }

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.8.3] - 2025-09-25
+
+### Added
+
+- Support to Django 6.1.
+
+### Changed
+
+- Renamed Django 5.3 to 6.0.
+
 ## [1.8.2] - 2025-08-10
 
 ### Changed

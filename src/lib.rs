@@ -184,8 +184,10 @@ pub enum DjangoVersion {
     V5_1,
     /// Django 5.2.
     V5_2,
-    /// Django 5.3.
-    V5_3,
+    /// Django 6.0.
+    V6_0,
+    /// Django 6.1.
+    V6_1,
 }
 
 impl DjangoVersion {
@@ -219,7 +221,8 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             DjangoVersion::V5_0 => 720_000,
             DjangoVersion::V5_1 => 870_000,
             DjangoVersion::V5_2 => 1_000_000,
-            DjangoVersion::V5_3 => 1_200_000,
+            DjangoVersion::V6_0 => 1_200_000,
+            DjangoVersion::V6_1 => 1_500_000,
         },
         #[cfg(feature = "with_argon2")]
         Algorithm::Argon2 => match *version {
