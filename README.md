@@ -266,7 +266,7 @@ Available versions:
 * `DjangoVersion::V5_1` Django 5.1
 * `DjangoVersion::V5_2` Django 5.2
 * `DjangoVersion::V6_0` Django 6.0
-* `DjangoVersion::V6_0` Django 6.1
+* `DjangoVersion::V6_1` Django 6.1
 
 ### Verifying a Hash Format (pre-crypto)
 
