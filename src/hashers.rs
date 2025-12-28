@@ -105,6 +105,7 @@ use argon2::{self, Version};
 
 #[cfg(feature = "with_argon2")]
 impl Hasher for Argon2Hasher {
+    #[allow(clippy::indexing_slicing)]
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split('$').collect();
         let version = match encoded_part.len() {
@@ -186,8 +187,12 @@ pub struct ScryptHasher;
 
 #[cfg(feature = "with_scrypt")]
 impl Hasher for ScryptHasher {
+    #[allow(clippy::indexing_slicing)]
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let encoded_part: Vec<&str> = encoded.split('$').collect();
+        if encoded_part.len() != 6 {
+            return Err(HasherError::BadHash);
+        }
         let work_factor: u8 = encoded_part[1].parse::<f32>().unwrap().log2() as u8;
         let salt = encoded_part[2];
         let block_size = encoded_part[3].parse::<u32>().unwrap();
@@ -225,8 +230,12 @@ pub struct BCryptSHA256Hasher;
 
 #[cfg(feature = "with_bcrypt")]
 impl Hasher for BCryptSHA256Hasher {
+    #[allow(clippy::indexing_slicing)]
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
+        if bcrypt_encoded_part.len() != 2 {
+            return Err(HasherError::BadHash);
+        }
         let cost = bcrypt_encoded_part[1]
             .split('$')
             .nth(2)
@@ -254,8 +263,12 @@ pub struct BCryptHasher;
 
 #[cfg(feature = "with_bcrypt")]
 impl Hasher for BCryptHasher {
+    #[allow(clippy::indexing_slicing)]
     fn verify(&self, password: &str, encoded: &str) -> Result<bool, HasherError> {
         let bcrypt_encoded_part: Vec<&str> = encoded.splitn(2, '$').collect();
+        if bcrypt_encoded_part.len() != 2 {
+            return Err(HasherError::BadHash);
+        }
         let cost = bcrypt_encoded_part[1]
             .split('$')
             .nth(2)

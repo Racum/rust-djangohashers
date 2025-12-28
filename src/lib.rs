@@ -121,6 +121,7 @@ fn get_hasher(algorithm: &Algorithm) -> Box<dyn Hasher + 'static> {
 }
 
 /// Verifies if an encoded hash is properly formatted before check it cryptographically.
+#[allow(clippy::must_use_candidate)]
 pub fn is_password_usable(encoded: &str) -> bool {
     !encoded.is_empty() && !encoded.starts_with('!') && identify_hasher(encoded).is_some()
 }
@@ -136,6 +137,7 @@ pub fn check_password(password: &str, encoded: &str) -> Result<bool, HasherError
 }
 
 /// Verifies a password against an encoded hash, returns a boolean, even in case of error.
+#[allow(clippy::must_use_candidate)]
 pub fn check_password_tolerant(password: &str, encoded: &str) -> bool {
     check_password(password, encoded).unwrap_or(false)
 }
@@ -192,7 +194,7 @@ pub enum DjangoVersion {
 
 impl DjangoVersion {
     /// Current Django version.
-    pub const CURRENT: Self = Self::V5_2;
+    pub const CURRENT: Self = Self::V6_0;
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -240,7 +242,15 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             | DjangoVersion::V2_2
             | DjangoVersion::V3_0
             | DjangoVersion::V3_1 => 1,
-            _ => 2,
+            DjangoVersion::V3_2
+            | DjangoVersion::V4_0
+            | DjangoVersion::V4_1
+            | DjangoVersion::V4_2
+            | DjangoVersion::V5_0
+            | DjangoVersion::V5_1
+            | DjangoVersion::V5_2
+            | DjangoVersion::V6_0
+            | DjangoVersion::V6_1 => 2,
         },
         #[cfg(feature = "with_scrypt")]
         Algorithm::Scrypt => 1,
@@ -267,6 +277,7 @@ lazy_static! {
 }
 
 /// Core function that generates all combinations of passwords:
+#[allow(clippy::must_use_candidate)]
 pub fn make_password_core(
     password: &str,
     salt: &str,
@@ -283,12 +294,14 @@ pub fn make_password_core(
 
 /// Based on the current Django version, generates an encoded hash given
 /// a complete set of parameters: password, salt and algorithm.
+#[allow(clippy::must_use_candidate)]
 pub fn make_password_with_settings(password: &str, salt: &str, algorithm: Algorithm) -> String {
     make_password_core(password, salt, algorithm, DjangoVersion::CURRENT)
 }
 
 /// Based on the current Django version, generates an encoded hash given
 /// a password and algorithm, uses a random salt.
+#[allow(clippy::must_use_candidate)]
 pub fn make_password_with_algorithm(password: &str, algorithm: Algorithm) -> String {
     make_password_core(password, &random_salt(), algorithm, DjangoVersion::CURRENT)
 }
@@ -340,6 +353,7 @@ mod features {
 
 /// Based on the current Django version, generates an encoded hash given
 /// only a password, uses a random salt and the PBKDF2 algorithm.
+#[allow(clippy::must_use_candidate)]
 pub fn make_password(password: &str) -> String {
     make_password_core(
         password,
@@ -363,6 +377,7 @@ pub struct Django {
     pub version: DjangoVersion,
 }
 
+#[allow(clippy::must_use_candidate)]
 impl Django {
     /// Based on the defined Django version, generates an encoded hash given
     /// a complete set of parameters: password, salt and algorithm.
