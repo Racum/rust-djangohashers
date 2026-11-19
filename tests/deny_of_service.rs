@@ -3,7 +3,7 @@ use djangohashers::*;
 #[test]
 #[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2_deny_of_servicez() {
-    let encoded = format!("pbkdf2_sha256${}$salt$hash", std::u32::MAX);
+    let encoded = format!("pbkdf2_sha256${}$salt$hash", u32::MAX);
     assert_eq!(
         check_password("pass", &encoded),
         Err(HasherError::InvalidIterations)
@@ -13,7 +13,7 @@ fn test_pbkdf2_deny_of_servicez() {
 #[test]
 #[cfg(feature = "with_pbkdf2")]
 fn test_pbkdf2_sha1_deny_of_service() {
-    let encoded = format!("pbkdf2_sha1${}$salt$hash", std::u32::MAX);
+    let encoded = format!("pbkdf2_sha1${}$salt$hash", u32::MAX);
     assert_eq!(
         check_password("pass", &encoded),
         Err(HasherError::InvalidIterations)

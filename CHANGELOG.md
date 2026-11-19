@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.9.0] - 2026-11-19
+
+### Added
+
+- Support to Django 6.2.
+- Missing tests for Django 6.1.
+
+### Changed
+
+- Set default Django version to 6.1.
+- Raised PBKDF2 iterations DoS limit to 1,800,000.
+- Updated rand, base64, bcrypt, constant_time_eq, md-5, sha2 and scrypt dependencies.
+- Replaced deprecated sha-1 dependency with sha1.
+
 ## [1.8.4] - 2025-12-28
 
 ### Added

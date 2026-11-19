@@ -37,7 +37,7 @@ Add the dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-djangohashers = "^1.8"
+djangohashers = "^1.9"
 ```
 
 Reference and import:
@@ -75,7 +75,7 @@ Add the dependency to your `Cargo.toml` declaring the feature:
 
 ```toml
 [dependencies.djangohashers]
-version = "^1.8"
+version = "^1.9"
 features = ["fpbkdf2"]
 ```
 
@@ -114,7 +114,7 @@ Hashing time: 49ms (Fast PBKDF2).
 
 ## Compatibility
 
-DjangoHashers passes all relevant unit tests from Django 1.4 to 6.0 (and betas up to 6.1), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
+DjangoHashers passes all relevant unit tests from Django 1.4 to 6.1 (and betas up to 6.2), there is even a [line-by-line translation](https://github.com/Racum/rust-djangohashers/blob/master/tests/django.rs) of [tests/auth_tests/test_hashers.py](https://github.com/django/django/blob/e403f22/tests/auth_tests/test_hashers.py).
 
 What is **not** covered:
 
@@ -244,7 +244,7 @@ let encoded = django.make_password("KRONOS");
 
 Available versions:
 
-* `DjangoVersion::CURRENT` Current Django version (`6.0` for DjangoHashers `1.8.4`).
+* `DjangoVersion::CURRENT` Current Django version (`6.1` for DjangoHashers `1.9.0`).
 * `DjangoVersion::V1_4` Django 1.4
 * `DjangoVersion::V1_5` Django 1.5
 * `DjangoVersion::V1_6` Django 1.6
@@ -267,6 +267,7 @@ Available versions:
 * `DjangoVersion::V5_2` Django 5.2
 * `DjangoVersion::V6_0` Django 6.0
 * `DjangoVersion::V6_1` Django 6.1
+* `DjangoVersion::V6_2` Django 6.2
 
 ### Verifying a Hash Format (pre-crypto)
 

@@ -94,8 +94,9 @@ pub fn hash_sha1(password: &str, salt: &str) -> String {
 
 #[cfg(feature = "with_bcrypt")]
 pub fn hash_sha256(password: &str) -> String {
+    use hex_fmt::HexFmt;
     use sha2::{Digest, Sha256};
-    format!("{:x}", Sha256::digest(password.as_bytes()))
+    format!("{}", HexFmt(&Sha256::digest(password.as_bytes())[..]))
 }
 
 #[cfg(feature = "with_legacy")]
@@ -154,7 +155,7 @@ pub fn hash_scrypt(
 ) -> String {
     const KEY_SIZE: usize = 64;
     let mut buf = [0u8; KEY_SIZE];
-    let params = Params::new(work_factor, block_size, parallelism, KEY_SIZE).unwrap();
+    let params = Params::new(work_factor, block_size, parallelism).unwrap();
     scrypt(password.as_bytes(), salt.as_bytes(), &params, &mut buf).unwrap();
     general_purpose::STANDARD.encode(buf)
 }

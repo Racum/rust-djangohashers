@@ -9,7 +9,7 @@
 //! model is already battle-tested.
 
 use lazy_static::lazy_static;
-use rand::Rng;
+use rand::RngExt;
 use rand::distr::Alphanumeric;
 mod crypto_utils;
 mod hashers;
@@ -190,11 +190,13 @@ pub enum DjangoVersion {
     V6_0,
     /// Django 6.1.
     V6_1,
+    /// Django 6.2.
+    V6_2,
 }
 
 impl DjangoVersion {
     /// Current Django version.
-    pub const CURRENT: Self = Self::V6_0;
+    pub const CURRENT: Self = Self::V6_1;
 }
 
 /// Resolves the number of iterations based on the Algorithm and the Django Version.
@@ -225,6 +227,7 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             DjangoVersion::V5_2 => 1_000_000,
             DjangoVersion::V6_0 => 1_200_000,
             DjangoVersion::V6_1 => 1_500_000,
+            DjangoVersion::V6_2 => 1_800_000,
         },
         #[cfg(feature = "with_argon2")]
         Algorithm::Argon2 => match *version {
@@ -250,7 +253,8 @@ fn iterations(version: &DjangoVersion, algorithm: &Algorithm) -> u32 {
             | DjangoVersion::V5_1
             | DjangoVersion::V5_2
             | DjangoVersion::V6_0
-            | DjangoVersion::V6_1 => 2,
+            | DjangoVersion::V6_1
+            | DjangoVersion::V6_2 => 2,
         },
         #[cfg(feature = "with_scrypt")]
         Algorithm::Scrypt => 1,
